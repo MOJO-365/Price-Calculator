@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const questionController = require("../controllers/QuestionsController");
 
-// Define routes
 router.post("/create-question", questionController.createQuestion);
 router.get("/get-all-questions", questionController.getAllQuestions);
 router.get("/get-question-by-id/:id", questionController.getQuestionById);

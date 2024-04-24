@@ -25,10 +25,7 @@ const PossibleAnswerSchema = new Schema(
 
 const QuestionSchema = new Schema(
   {
-    // _id: {
-    //   type: Schema.Types.ObjectId,
-    //   alias: "questionId", // Rename _id to questionId
-    // },
+    
     questionText: {
       type: String,
       required: true,

@@ -1,6 +1,6 @@
 const Question = require("../models/QuestionsSchema");
 
-// Create a new question
+
 const createQuestion = async (req, res) => {
   try {
     const newQuestion = new Question(req.body);
@@ -33,7 +33,7 @@ const getAllQuestions = async (req, res) => {
   }
 };
 
-// Get a question by ID
+
 const getQuestionById = async (req, res) => {
   try {
     const question = await Question.findById(req.params.id);
@@ -58,7 +58,7 @@ const getQuestionById = async (req, res) => {
   }
 };
 
-// Update a question by ID
+
 const updateQuestion = async (req, res) => {
   try {
     const questionData = req.body;
