@@ -6,21 +6,25 @@ const { Schema } = mongoose;
 const PossibleAnswerSchema = new Schema(
   {
     answerValue: {
-      type: Schema.Types.Mixed, // This can be boolean, integer, or range depending on the type of question
+      type: Schema.Types.Mixed, // This can be boolean, integer range or string depending on the type of question
       required: true,
     },
     cost: {
       type: Number,
-      required: true,
+      required: false,
+      default: 0,
+    },
+    isQuantifyable: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    message: {
+      type: String
     },
   },
   { _id: false }
 );
-
-
-
-
-
 
 
 const QuestionSchema = new Schema(
@@ -33,7 +37,7 @@ const QuestionSchema = new Schema(
     questionType: {
       type: String,
       required: true,
-      enum: ["boolean", "integer", "range"],
+      enum: ["boolean", "number", "range", "string"],
     },
 
     noOfPossibleAnswers: {
@@ -42,7 +46,7 @@ const QuestionSchema = new Schema(
     },
     possibleAnswers: [
       PossibleAnswerSchema, 
-    ],
+    ]
   },
   { timestamps: true }
 );
