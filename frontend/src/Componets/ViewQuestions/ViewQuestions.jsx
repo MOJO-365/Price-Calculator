@@ -15,7 +15,8 @@ const ViewQuestions = () => {
   const [questions, setQuestions] = useState([]);
   const [deleteDialog, setDeleteDialog] = useState(false);
   const [answerModal, setAnswerModal] = useState(false);
-
+  const [viewQuestionIndex, setViewQuestionIndex] = useState(0);
+  const [deleteIndex, setDeleteIndex] = useState(0);
   const getAllQuestions = async () => {
     await axios.get("/questions-and-flows/get-all-questions").then((resp) => {
       console.log(resp.data.data[0]);
@@ -27,6 +28,18 @@ const ViewQuestions = () => {
     getAllQuestions();
   }, []);
 
+  const handleDelete = async () => {
+    const idx = questions[deleteIndex]._id;
+    // console.log
+    await axios.delete(`/questions-and-flows/delete-question/${idx}`).then((resp) => {
+      if (resp.data.message === "success") {
+        closeDeleteDialog();
+      } else {
+        alert("Delete Error!")
+        closeDeleteDialog();
+      }
+    });
+  }
   const closeDeleteDialog = () => {
     setDeleteDialog(false);
   }
@@ -59,8 +72,14 @@ const ViewQuestions = () => {
                   </div>
 
                   <div className="rightBottomDiv">
-                    <button onClick={openAnswerModal}>View Answers</button>
-                    <button onClick={openDeleteDialog}>Delete</button>
+                    <button onClick={() => {
+                      setViewQuestionIndex(index)
+                      openAnswerModal()
+                    }}>View Answers</button>
+                    <button onClick={() => {
+                      setDeleteIndex(index);
+                      openDeleteDialog();
+                    }}>Delete</button>
                   </div>
                 </div>
               </Grid>
@@ -71,6 +90,7 @@ const ViewQuestions = () => {
             <ViewAnswerModal
               isOpen={openAnswerModal}
               onClose={closeAnswerModal}
+              answers={questions[viewQuestionIndex].possibleAnswers}
             />
           )}
 
@@ -106,7 +126,7 @@ const ViewQuestions = () => {
               Disagree
             </Button>
             <Button
-            // onClick={handleDeleteSupplier}
+            onClick={handleDelete}
             >
               Agree
             </Button>
