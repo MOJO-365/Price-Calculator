@@ -100,7 +100,7 @@ const deleteQuestion = async (req, res) => {
       res.status(200);
       res.json({
         message: "success",
-        data: deleteQuestion,
+        data: deletedQuestion,
       });
     }
   } catch (error) {
