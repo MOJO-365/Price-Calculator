@@ -1,0 +1,76 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat+Alternates:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Questrial&display=swap');
+
+
+.viewQues{
+  padding: 100px 40px;
+}
+.questionSectionDiv{
+  background-color: #fff;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+  padding: 20px;
+  border: 3px solid #63a9e727;
+  overflow: auto;
+  height: 100%;
+  position: relative;
+}
+
+.row1{
+  display: flex;
+  justify-content: space-between;
+}
+.row1 > p{
+  margin: 0;
+  font-size: 15px;
+  /* font-weight: 60; */
+  margin-bottom: 5px;
+  font-family: "Poppins", sans-serif;
+  font-weight: 550;
+  font-style: normal;
+  letter-spacing: 1.2px;
+  /* overflow: ; */
+}
+.questionBtnDiv{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.viewAnswersBtn{
+  border: none;
+  padding: 3px 10px;
+  font-size: 13px;
+  font-weight: 500;
+  background-color: #63a9e765;
+  color: var(--blue-mojo);
+  border-radius: 3px;
+  margin: 0px 3px;
+}
+.questionAdd{
+  font-size: 13px;
+  /* margin-bottom: 10px; */
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  font-style: normal;
+  letter-spacing: 1.2px;
+  text-transform: capitalize;
+  color: var(--blue-mojo);
+  margin-bottom: 45px;
+}
+
+.rightBottomDiv{
+  position: absolute;
+  bottom: 20px;
+  right: 15px;
+  display: flex;
+  gap: 5px;
+}
+
+.rightBottomDiv > button{
+  background-color: transparent;
+  border: none;
+  background-color: #63a9e727;
+  padding: 5px 10px;
+  font-size: 12px;
+  color: #074376;
+  font-weight: 500;
+  border-radius: 2px;
+}

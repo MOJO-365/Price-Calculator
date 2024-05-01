@@ -1,0 +1,41 @@
+.addQuestionModal{
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 50%;
+  height: 75%;
+  transform: translate(-50%,-50%);
+  z-index: 1500;
+  background-color: #fff;
+  border-radius: 5px;
+  text-align: center;
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+  overflow: auto;
+  overflow-x: hidden;
+}
+
+.closingModalDiv{
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--blue-mojo);
+  color: var(--yellow-mojo);
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 26px;
+}
+
+.formContent{
+  margin: 25px;
+}
+
+.answerAndQuantity{
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
