@@ -1,7 +1,6 @@
 
 const User = require("../models/User.js")
 const bcrypt = require("bcryptjs");
-const errorUtil = require("../utils/error.js")
 const jwt = require("jsonwebtoken")
 
 const register = async (req, res, next) => {
@@ -29,18 +28,38 @@ const login = async (req, res, next) => {
   try {
     const user = await User.findOne({ username: req.body.username });
     
-    if (!user) return next(errorUtil.createError(404, "User not found!"));
+    if (!user) {
+      // return next(errorUtil.createError(404, "User not found!"));
+      res.status(404)
+      res.json({
+        message: "failure",
+        data: "User not found!"
+      });
+    }
+      
 
     const isPasswordCorrect = await bcrypt.compare(
       req.body.password,
       user.password
     );
     if (!isPasswordCorrect)
-      return next(errorUtil.createError(400, "Wrong password or username!"));
+    {
+      // return next(errorUtil.createError(400, "Wrong password or username!"));
+      res.status(400);
+      res.json({
+        message: "failure",
+        data: "Wrong password or username!",
+      });
+
+    }
+      
 
     const token = jwt.sign(
       { id: user._id, isAdmin: user.isAdmin, usrname: user.username },
-      process.env.JWT
+      process.env.JWT,
+      {
+        expiresIn: '2h' 
+      }
     );
     
 
@@ -52,7 +71,11 @@ const login = async (req, res, next) => {
       .status(200)
       .json({ details: { ...otherDetails }, isAdmin });
   } catch (err) {
-    next(err);
+   res.status(400);
+   res.json({
+     message: "failure",
+     data: "Error occurred while login: "+err.message
+   });
   }
 };
 

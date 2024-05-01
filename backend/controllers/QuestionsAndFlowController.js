@@ -115,7 +115,7 @@ const deleteQuestion = async (req, res) => {
 const createFlow = async (req, res) => {
   
   try {
-    const listOfFlow = req.body
+    const listOfFlow = req.body.listOfFlow;
     for (const flow of listOfFlow) {
       
       const flowNode = new FlowSchema(flow);
