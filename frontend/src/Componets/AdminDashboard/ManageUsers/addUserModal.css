@@ -1,0 +1,59 @@
+.addUserModal{
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 45%;
+  height: 50%;
+  transform: translate(-50%,-50%);
+  z-index: 1500;
+  background-color: #fff;
+  border-radius: 5px;
+  text-align: center;
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+  overflow: auto;
+  /* overflow-x: hidden;/ */
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.addUserDiv > h4{
+  margin-top: 2%;
+  font-size: 20px;
+  color: var(--blue-mojo);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.addUserSection{
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.addUserSection > input{
+  width: 280px;
+  padding: 8px 25px;
+  background-color: rgb(231, 231, 231);
+  border: none;
+  outline: none;
+  font-size: 15px;
+  font-family: "Poppins", sans-serif;
+  border-radius: 5px;
+  cursor:inherit;
+}
+
+.submitAddUserBtn > button{
+  background-color: transparent;
+  border: none;
+  background-color: var(--blue-mojo);
+  color: var(--yellow-mojo);
+  padding: 9px 15px;
+  border-radius: 3px;
+  margin-top: 20px;
+  font-size: 14.5px;
+  font-weight: 550;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}

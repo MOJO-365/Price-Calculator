@@ -2,6 +2,8 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import AdminDashboard from "./Componets/AdminDashboard/AdminDashboard";
 import Navbar from "./Componets/Navbar/Navbar";
 import ViewQuestions from "./Componets/ViewQuestions/ViewQuestions";
+import Register from "./Componets/Register/Register";
+import Signin from "./Componets/Signin/Signin";
 
 function App() {
   return (
@@ -19,6 +21,9 @@ function App() {
               </>
             }
           ></Route>
+
+          <Route path="/register" element={<Register />}></Route>
+          <Route path="/signin" element={<Signin />}></Route>
         </Routes>
       </BrowserRouter>
     </>

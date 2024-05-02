@@ -16,6 +16,8 @@ import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
+
+
 const drawerWidth = 240;
 const navItems = ["Home", "View Flow", "View Questions"];
 const theme = createTheme({
@@ -28,7 +30,7 @@ const theme = createTheme({
 const Navbar = (props) => {
   const { window } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
-
+  
   const handleDrawerToggle = () => {
     setMobileOpen((prevState) => !prevState);
   };
@@ -78,7 +80,7 @@ const Navbar = (props) => {
                 flexGrow: 1,
                 display: { xs: "none", sm: "block" },
                 color: "#F8B31C",
-                cursor: "pointer"
+                cursor: "pointer",
               }}
               onClick={() => navigate("/")}
             >
@@ -126,6 +128,7 @@ const Navbar = (props) => {
         </nav>
         {/* <Box component="main" sx={{ p: 3 }}>
       </Box> */}
+        
       </Box>
     </ThemeProvider>
   );

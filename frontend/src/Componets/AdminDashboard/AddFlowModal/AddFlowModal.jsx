@@ -414,7 +414,7 @@ const AddFlowModal = ({ isOpen, onClose }) => {
                               <TableCell>{question.questionText}</TableCell>
                               <TableCell>{question.questionType}</TableCell>
                               <TableCell>
-                                {question.possibleAnswers[subIndex].answerValue}
+                                {/* {question.possibleAnswers[subIndex].answerValue} */}
                               </TableCell>
                               <TableCell>
                                 {
