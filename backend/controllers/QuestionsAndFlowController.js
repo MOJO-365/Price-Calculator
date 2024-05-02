@@ -267,6 +267,74 @@ const editFlow = async (req, res) => {
   
 }
 
+const isFlowValid = async (req, res)=>{
+  
+  try {
+    const selectedQuestionsList = req.body.selectedQuestionsList
+    const listOfFlow = req.body.listOfFlow
+
+    const list1 = []
+    const list2 = []
+
+    if (Array.isArray(listOfFlow)) {
+        
+      listOfFlow.forEach(flow => {
+            
+        const currQuestionId = flow.currQuestionId;
+        const answerValue = flow.answerValue;
+        const nextQuestionId = flow.nextQuestionId;
+            
+        list1.push(nextQuestionId)
+            
+      });
+    }
+    else {
+      res.status(500)
+      res.json({
+        message: "failure",
+        data: "Improper reques body"
+      })
+    }
+
+
+
+    if (Array.isArray(selectedQuestionsList)) {
+      selectedQuestionsList.forEach((question) => {
+        const questionId = question._id;
+    
+        list2.push(questionId);
+        
+      });
+
+    } else {
+      res.status(500);
+      res.json({
+        message: "failure",
+        data: "Improper reques body",
+      });
+    }
+
+    res.status(200)
+    res.json({
+      message: "success",
+      data:[list1, list2]
+    })
+
+
+  }
+  catch (error) {
+    res.status(500)
+    res.json({
+      message: "failure",
+      data: "Error occurred while validating flow: "+data.message
+    })
+
+  }
+
+}
+ 
+
+
 module.exports = {
   createQuestion,
   getAllQuestions,
