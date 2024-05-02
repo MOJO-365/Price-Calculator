@@ -30,4 +30,6 @@ router.post("/get-flow/:flowName", questionAndFlowController.getAllFlowRecordsBy
 router.post("/get-root/:flowName", questionAndFlowController.getRootOfFlowByFlowName);
 
 
+//To edit a flow, pass flow name in url and request body same as create flow
+router.put("/edit-flow/:flowName", questionAndFlowController.editFlow);
 module.exports = router;

@@ -237,7 +237,35 @@ const deleteFlow = async (req, res) => {
   }
 }
 
+const editFlow = async (req, res) => {
+  const flowName = req.params.flowName;
+  console.log("FLOW NAME: " + flowName);
 
+  const deleteResultCount = await FlowSchema.deleteMany({ flowName });
+
+  if (deleteResultCount < 0) {
+    res
+      .status(404)
+      .json({ message: "No flows found with the specified flowName." });
+  }
+  else {
+    const listOfFlow = req.body.listOfFlow;
+    for (const flow of listOfFlow) {
+      const flowNode = new FlowSchema(flow);
+
+      await flowNode.save();
+    }
+
+    console.log(flowName,"flow updated")
+    res.status(200).json({
+      message: "success",
+      data: listOfFlow,
+    });
+
+}
+  
+  
+}
 
 module.exports = {
   createQuestion,
@@ -249,6 +277,7 @@ module.exports = {
   deleteFlow,
   getAllFlowRecordsByFlowName,
   getRootOfFlowByFlowName,
+  editFlow
 };
 
 
