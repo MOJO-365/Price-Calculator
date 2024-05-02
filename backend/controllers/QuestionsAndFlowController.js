@@ -270,12 +270,14 @@ const editFlow = async (req, res) => {
 const isFlowValid = async (req, res)=>{
   
   try {
+    
     const selectedQuestionsList = req.body.selectedQuestionsList
     const listOfFlow = req.body.listOfFlow
 
-    const list1 = []
-    const list2 = []
-
+    const flowNextQuestionIdsList = []
+    const selectedQuestionIdsList = []
+    let itemsNotInFlowNextQuestionIds = []
+    let rootQuestionId = ""
     if (Array.isArray(listOfFlow)) {
         
       listOfFlow.forEach(flow => {
@@ -283,9 +285,15 @@ const isFlowValid = async (req, res)=>{
         const currQuestionId = flow.currQuestionId;
         const answerValue = flow.answerValue;
         const nextQuestionId = flow.nextQuestionId;
-            
-        list1.push(nextQuestionId)
-            
+        const isFlow = flow.isRoot;
+        if (isFlow) {
+          rootQuestionId = currQuestionId;
+        }
+        if (nextQuestionId != null) {
+          flowNextQuestionIdsList.push(nextQuestionId);
+        }
+        
+           
       });
     }
     else {
@@ -302,9 +310,20 @@ const isFlowValid = async (req, res)=>{
       selectedQuestionsList.forEach((question) => {
         const questionId = question._id;
     
-        list2.push(questionId);
+        selectedQuestionIdsList.push(questionId);
         
       });
+
+
+      itemsNotInFlowNextQuestionIds = selectedQuestionIdsList.filter((id) => {
+        return !flowNextQuestionIdsList.includes(id);
+      });
+      const index = itemsNotInFlowNextQuestionIds.indexOf(rootQuestionId);
+
+      if (index !== -1) {
+        itemsNotInFlowNextQuestionIds.splice(index, 1);
+      }
+      
 
     } else {
       res.status(500);
@@ -317,8 +336,12 @@ const isFlowValid = async (req, res)=>{
     res.status(200)
     res.json({
       message: "success",
-      data:[list1, list2]
-    })
+      data: {
+        selectedQuestionIds: selectedQuestionIdsList,
+        flowNextQuestionIds: flowNextQuestionIdsList,
+        unusedQuestionIds: itemsNotInFlowNextQuestionIds,
+      },
+    });
 
 
   }
@@ -326,7 +349,7 @@ const isFlowValid = async (req, res)=>{
     res.status(500)
     res.json({
       message: "failure",
-      data: "Error occurred while validating flow: "+data.message
+      data: "Error occurred while validating flow: "+error.message
     })
 
   }
@@ -345,7 +368,8 @@ module.exports = {
   deleteFlow,
   getAllFlowRecordsByFlowName,
   getRootOfFlowByFlowName,
-  editFlow
+  editFlow,
+  isFlowValid
 };
 
 

@@ -1,12 +1,26 @@
 
 const User = require("../models/User")
+const bcrypt = require("bcryptjs");
 const updateUser = async (req, res, next) => {
   try {
+    const newUsername = req.body.username
+    const newPassword = req.body.password
+    const newIsAdmin = req.body.isAdmin
+    
+    const salt = bcrypt.genSaltSync(10);
+    const hash = bcrypt.hashSync(newPassword, salt);
+
     const updatedUser = await User.findByIdAndUpdate(
-      req.params.id,
-      { $set: req.body },
+      req.params.id, {
+        username: newUsername,
+        password: hash,
+        isAdmin:  newIsAdmin
+      },
+      // { $set: req.body },
       { new: true }
     );
+
+    
     res.status(200).json(updatedUser);
   } catch (err) {
     res.status(404);
@@ -17,6 +31,7 @@ const updateUser = async (req, res, next) => {
     // next(err);
   }
 };
+
 const deleteUser = async (req, res, next) => {
   try {
     await User.findByIdAndDelete(req.params.id);
