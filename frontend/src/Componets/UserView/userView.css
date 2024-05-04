@@ -111,10 +111,11 @@
   align-items: center;
 } */
 .rightView > p{
-  font-size: 20px;
+  font-size: 25px;
   font-weight: 650;
-  color: var(--blue-mojo);
+  color: var(--yellow-mojo);
   text-transform: uppercase;
+  margin-bottom: 15px;
 }
 
 .totalCostTable{
@@ -141,3 +142,40 @@
   word-wrap: break-word;
 }
 
+.finalMsg{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 90vh;
+}
+
+.finalMsg > p{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  width: 700px;
+  height: 200px;
+  background-color: #ffffff; 
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 5px 0px, rgba(0, 0, 0, 0.1) 0px 0px 1px 0px;
+  font-size: 20px;
+  text-align: center;
+  border-radius: 5px;
+  background-color: #f8b21c72;
+  font-weight: 600;
+  color: var(--blue-mojo);
+}
+
+
+.finalMsg > button{
+  background: transparent;
+  border: none;
+  background-color: var(--blue-mojo);
+  padding: 7px 14px;
+  border-radius: 3px;
+  color: var(--yellow-mojo); 
+  font-size: 17px;
+  outline: none;
+  margin-top: 30px;
+}

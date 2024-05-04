@@ -7,29 +7,35 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import Button from "@mui/material/Button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ViewEditModal from "./ViewEditModal/ViewEditModal";
 
 
 const ViewFlow = () => {
-  const [allFlows, setAllFlows] = useState([
-  {
-    flowname: "f1"
-  },
-  {
-    flowname: "f2"
-  },
-  {
-    flowname: "f1"
-  },
-  {
-    flowname: "f2"
-  }
-  ]);
+  const [allFlows, setAllFlows] = useState([]);
   const [deleteDialog, setDeleteDialog] = useState(false);
   const [deleteIndex, setDeleteIndex] = useState(0);
   const [viewEditModal, setViewEditModal] = useState(false);
   const [viewFlowIndex, setViewFlowIndex] = useState(0);
+
+  const getAllFlows = async () => {
+    await axios.get("/questions-and-flows/get-all-flows").then((resp) => {
+      console.log(resp.data.data)
+      if (resp.status === 200) {
+        
+        setAllFlows(resp.data.data);
+        // const combinedFlows = resp.data.data.reduce((acc, obj) => {
+        //   return acc.concat(obj.flows);
+        // }, []);
+        // console.log(combinedFlows);
+      }
+    });
+  }
+
+  useEffect(() => {
+    getAllFlows();
+  }, []);
+
   const closeDeleteDialog = () => {
     setDeleteDialog(false);
   };
@@ -46,7 +52,13 @@ const ViewFlow = () => {
     setViewEditModal(false);
   }
   const handleDelete = async () => {
-
+    const flowname = allFlows[deleteIndex].flowName;
+    await axios.delete(`/delete-flow/${flowname}`).then((resp) => {
+      console.log(resp.data.data);
+      if (resp.status === 200) {
+        setAllFlows(resp.data.data[0].flows);
+      }
+    });
   }
 
   return (
@@ -58,7 +70,7 @@ const ViewFlow = () => {
               <Grid item xs={12} sm={6} md={6} lg={3} key={index}>
                 <div className="flowSectionDiv">
                   <div className="row1">
-                    <p>{`${flow.flowname}`}</p>
+                    <p>{`${flow._id}`}</p>
                   </div>
 
                   {/* <div className="questionAdd">
@@ -94,7 +106,7 @@ const ViewFlow = () => {
           <ViewEditModal
             isOpen={openViewEditModal}
             onClose={closeViewEditModal}
-            // flowData={questions[deleteIndex]}
+            flowSelected={allFlows[viewFlowIndex]}
           />
         )} 
 

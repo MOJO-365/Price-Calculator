@@ -22,6 +22,7 @@ import Button from "@mui/material/Button";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import AddUserModal from "./AddUserModal";
+import Cookies from "js-cookie";
 
 const ManageUsers = ({ isOpen, onClose }) => {
   const [showPassword, setShowPassword] = useState([]);
@@ -31,8 +32,7 @@ const ManageUsers = ({ isOpen, onClose }) => {
   const [deleteDialog, setDeleteDialog] = useState(false);
   const [deleteIndex, setDeleteIndex] = useState(0);
   const [addUser, setAddUser] = useState(false);
-  
-  
+  const [token, setToken] = useState();
   
   const handleClickShowPassword = (index) => {
     const newShowPassword = [...showPassword];
@@ -62,6 +62,11 @@ const ManageUsers = ({ isOpen, onClose }) => {
       await axios.put(`/users/edit-user/${idx}`, {
       username: editData[index].username,
       password: editData[index].password
+      }, {
+      headers: {
+            "Content-Type": "application/json",
+            "authorization": `Bearer ${token}`,
+          },
     }).then((resp) => {
       if (resp.status === 200) {
         toast.success("Data edited successfully", {
@@ -116,52 +121,61 @@ const ManageUsers = ({ isOpen, onClose }) => {
   const handleDelete = async () => {
     const idx = usersData[deleteIndex]._id;
     try {
-      await axios.delete(`/users/delete-user/${idx}`).then((resp) => {
-        if (resp.status === 200) {
-        toast.success("User deleted successfully", {
-          position: "top-right",
-          autoClose: 2000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          onClose: () => {
-            getAllUsers();
+      await axios
+        .delete(`/users/delete-user/${idx}`, {
+          headers: {
+            "Content-Type": "application/json",
+            authorization: `Bearer ${token}`,
           },
+        })
+        .then((resp) => {
+          if (resp.status === 200) {
+            toast.success("User deleted successfully", {
+              position: "top-right",
+              autoClose: 2000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              onClose: () => {
+                getAllUsers();
+              },
+            });
+          }
         });
-      }
-      
-    });
     } catch (error) {
       toast.error("Unable to delete the user. Try again.");
     }
     closeDeleteDialog();
   }
   const getAllUsers = async () => {
-    const cookieName = "access_token";
-    const cookieValue = document.cookie
-        .split("; ")
-      .find((row) => row.startsWith(`${cookieName}=`));
-    console.log(cookieValue)
+    const tokenFromCookie = Cookies.get("access_token");
     // if (cookieValue) {
       await axios
-      .get("/users/get-users/", {
-      })
-      .then((resp) => {
-        if (resp.status === 200) {
-          const data = resp.data;
-          const nonAdminUsers = data.filter((user) => !user.isAdmin);
-          setUsersData(nonAdminUsers);
-          setEditData(nonAdminUsers);
-        }
-      });
+        .get("/users/get-users/", {
+          headers: {
+            "Content-Type": "application/json",
+            authorization: `Bearer ${tokenFromCookie}`,
+          },
+        })
+        .then((resp) => {
+          console.log(resp.data);
+          if (resp.status === 200) {
+            const data = resp.data;
+            const nonAdminUsers = data.filter((user) => !user.isAdmin);
+            setUsersData(nonAdminUsers);
+            setEditData(nonAdminUsers);
+          }
+        });
     // }
     
   };
 
 
   useEffect(() => {
+    const tokenFromCookie = Cookies.get("access_token");
+    setToken(tokenFromCookie);
     getAllUsers();
   }, []);
   

@@ -116,7 +116,7 @@ const AddFlowModal = ({ isOpen, onClose }) => {
   }
 
   const renderOptionsGrid = () => {
-    const optionsAvailable = ['Option 1', 'Option 2', 'Option 3', 'Option 4', 'Option 5']
+    // const optionsAvailable = ['Option 1', 'Option 2', 'Option 3', 'Option 4', 'Option 5']
     // console.log(questions)
     return (
       <Grid container spacing={2} sx={{padding: 2}}>
@@ -137,14 +137,14 @@ const AddFlowModal = ({ isOpen, onClose }) => {
     );
   }
 
-   const handleConnectionChange = (option, type, value) => {
-     const updatedConnections = { ...connections };
-     if (!updatedConnections[option]) {
-       updatedConnections[option] = {};
-     }
-     updatedConnections[option][type] = value;
-     setConnections(updatedConnections);
-  };
+  //  const handleConnectionChange = (option, type, value) => {
+  //    const updatedConnections = { ...connections };
+  //    if (!updatedConnections[option]) {
+  //      updatedConnections[option] = {};
+  //    }
+  //    updatedConnections[option][type] = value;
+  //    setConnections(updatedConnections);
+  // };
   
   const handleStartClick = (index) => {
     if (rootIndex === -1) {
@@ -217,8 +217,8 @@ const AddFlowModal = ({ isOpen, onClose }) => {
     const contains = flowList.findIndex(
       (obj) =>
         obj.currQuestionId === questions[index]._id &&
-        obj.answerValue ===
-          questions[index].possibleAnswers[subIndex].answerValue
+        obj.answerValue.toLowerCase() ===
+          questions[index].possibleAnswers[subIndex].answerValue.toLowerCase()
     );
     if (contains !== -1) {
       // console.log("Contains: ",contains)

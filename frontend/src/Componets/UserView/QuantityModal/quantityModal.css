@@ -1,9 +1,9 @@
-.viewEditModal{
+.addQtyModal{
   position: fixed;
   top: 50%;
   left: 50%;
-  width: 80%;
-  height: 85%;
+  width: 35%;
+  height: 40%;
   transform: translate(-50%,-50%);
   z-index: 1500;
   background-color: #fff;
@@ -11,5 +11,10 @@
   text-align: center;
   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
   overflow: auto;
-  overflow-x: hidden;
+  /* overflow-x: hidden;/ */
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
