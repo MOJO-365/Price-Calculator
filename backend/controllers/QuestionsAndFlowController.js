@@ -12,7 +12,10 @@ const createQuestion = async (req, res) => {
     });
   } catch (error) {
     console.log("Error while creating question: ", error.message);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({
+      error: error.message,
+      message:"failure"
+    });
   }
 };
 
@@ -39,7 +42,7 @@ const getQuestionById = async (req, res) => {
     const question = await Question.findById(req.params.id);
     if (!question) {
       res.status(404).json({
-        error: "Question not found",
+        data: "Question not found",
         message: "failure",
       });
     } else {
@@ -69,7 +72,7 @@ const updateQuestion = async (req, res) => {
     );
     if (!updatedQuestion) {
       res.status(404).json({
-        error: "Question not found",
+        data: "Question not found",
         message: "failure",
       });
     } else {
@@ -93,7 +96,7 @@ const deleteQuestion = async (req, res) => {
     const deletedQuestion = await Question.findByIdAndDelete(req.params.id);
     if (!deletedQuestion) {
       res.status(404).json({
-        error: "Question not found",
+        data: "Question not found",
         message: "failure",
       });
     } else {
@@ -134,7 +137,7 @@ const createFlow = async (req, res) => {
     res.status(500)
     res.json({
       message: "failure",
-      data:""+error.message
+      error:""+error.message
     })
   }
 }
@@ -167,7 +170,7 @@ const getAllFlowRecordsByFlowName = async (req, res) => {
     res.status(500);
     res.json({
       message: "failure",
-      data: "" + error.message,
+      error: "" + error.message,
     });
   }
 }
@@ -198,7 +201,7 @@ const getRootOfFlowByFlowName = async (req, res) => {
     res.status(500);
     res.json({
       message: "failure",
-      data: "" + error.message,
+      error: "" + error.message,
     });
   }
 }
@@ -232,7 +235,7 @@ const deleteFlow = async (req, res) => {
      res.status(500);
      res.json({
        message: "failure",
-       data: ""+error.message,
+       error: ""+error.message,
      });
   }
 }
@@ -244,9 +247,10 @@ const editFlow = async (req, res) => {
   const deleteResultCount = await FlowSchema.deleteMany({ flowName });
 
   if (deleteResultCount < 0) {
-    res
-      .status(404)
-      .json({ message: "No flows found with the specified flowName." });
+    res.status(404).json({
+      message: "failure",
+      data: "No flows found with the specified flowName.",
+    });
   }
   else {
     const listOfFlow = req.body.listOfFlow;
@@ -349,7 +353,7 @@ const isFlowValid = async (req, res)=>{
     res.status(500)
     res.json({
       message: "failure",
-      data: "Error occurred while validating flow: "+error.message
+      error: "Error occurred while validating flow: "+error.message
     })
 
   }
@@ -357,7 +361,63 @@ const isFlowValid = async (req, res)=>{
 }
  
 
+const getAllFlowNames = async (req, res) => {
+  
+  try {
+    const flowNames = await FlowSchema.distinct('flowName');
 
+    if (!flowNames) {
+      
+      res.status(200)
+      res.json({
+        message: "failure",
+        data: "No flows found"
+      })
+    }
+    else {
+      
+      res.status(200)
+      res.json({
+        message: "success",
+        data: flowNames
+      })
+    }
+  } catch (error) {
+    
+    res.status(500)
+    res.json({
+      message: "failure",
+      error: "Error occurred while fetching flow names: "+error.message
+    })
+  }
+}
+
+
+
+
+const getAllFlows = async (req, res) => {
+  
+  try {
+    
+    const groupedFlows = await FlowSchema.aggregate([
+      {
+        $group: {
+          _id: "$flowName", 
+          flows: { $push: "$$ROOT" }, 
+        },
+      },
+    ]);
+
+    res.status(200)
+    res.json({ 
+      message: "success",
+      data: groupedFlows
+     });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error", message: "failure" });
+  }
+}
 module.exports = {
   createQuestion,
   getAllQuestions,
@@ -369,7 +429,9 @@ module.exports = {
   getAllFlowRecordsByFlowName,
   getRootOfFlowByFlowName,
   editFlow,
-  isFlowValid
+  isFlowValid,
+  getAllFlowNames,
+  getAllFlows
 };
 
 

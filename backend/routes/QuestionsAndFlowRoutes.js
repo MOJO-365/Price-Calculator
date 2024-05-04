@@ -36,4 +36,8 @@ router.put("/edit-flow/:flowName", questionAndFlowController.editFlow);
 
 router.post("/is-flow-valid/:flowName", questionAndFlowController.isFlowValid)
 
+router.get("/get-flow-names", questionAndFlowController.getAllFlowNames)
+
+router.get("/get-all-flows", questionAndFlowController.getAllFlows)
+
 module.exports = router;
