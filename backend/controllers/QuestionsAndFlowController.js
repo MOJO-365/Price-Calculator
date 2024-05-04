@@ -221,7 +221,7 @@ const deleteFlow = async (req, res) => {
       res.status(200).json({
         message: "success",
         data: `${result.deletedCount} flows deleted successfully.`,
-        flows: flows
+        // flows: flows
       });
     } else {
       
@@ -406,18 +406,75 @@ const getAllFlows = async (req, res) => {
           flows: { $push: "$$ROOT" }, 
         },
       },
-    ]);
+    ]); 
 
     res.status(200)
-    res.json({ 
+    res.json({
       message: "success",
-      data: groupedFlows
-     });
+      data: await processJsonData(groupedFlows),
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error", message: "failure" });
   }
 }
+
+
+const processJsonData = async (jsonData) => {
+  // Iterate through each element in the data array
+  for (const dataItem of jsonData) {
+    // Iterate through each flow in the flows array
+    for (const flow of dataItem.flows) {
+      // Fetch the current question by ID
+      try {
+        const currQuestion = await Question.findById(flow.currQuestionId);
+        // If the current question is found, append it to the flow object
+        if (currQuestion) {
+          flow.currQuestion = currQuestion;
+        }
+
+        // Fetch the next question by ID (if nextQuestionId is not null)
+        if (flow.nextQuestionId) {
+          const nextQuestion = await Question.findById(flow.nextQuestionId);
+          // If the next question is found, append it to the flow object
+          if (nextQuestion) {
+            flow.nextQuestion = nextQuestion;
+          }
+        }
+      } catch (error) {
+        console.error(`Error fetching question by ID: ${error}`);
+        // Handle any errors that occur during fetching the questions
+        flow.error = "Error fetching question data";
+      }
+    }
+  }
+
+  // Return the modified jsonData with appended questions data
+  return jsonData;
+};
+
+
+const getQuestionByIdHelper = async (questionId) => {
+  try {
+    
+    const question = await Question.findById(questionId);
+
+    // Check if the question exists
+    if (!question) {
+      // Return a message if no question is found with the provided ID
+      return null
+      // return { message: "Question not found" };
+    }
+
+    // Return the question if found
+    return question;
+  } catch (error) {
+    // Handle any errors that occur during the operation
+    console.error("Error fetching question by ID:", error);
+    return null;
+    // return { error: "Error fetching question by ID" };
+  }
+};
 module.exports = {
   createQuestion,
   getAllQuestions,
