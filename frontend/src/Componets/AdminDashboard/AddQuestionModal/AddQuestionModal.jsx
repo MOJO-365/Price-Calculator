@@ -3,60 +3,207 @@ import "./addQuestionModal.css";
 import { TextField, RadioGroup, Radio, FormControlLabel, Button, FormControl, FormLabel, Typography, Checkbox } from '@mui/material';
 import { useState } from "react";
 import axios from "../../../axiosConfig";
-
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 const AddQuestionModal = ({ isOpen, onClose }) => {
   const [questionText, setQuestionText] = useState("");
-  const [questionType, setQuestionType] = useState('boolean');
-  const [numAnswers, setNumAnswers] = useState(2);
-  const [answers, setAnswers] = useState([{ answerValue: '', isQuantifyable: false }]);
+  const [questionType, setQuestionType] = useState('');
+  const [numAnswers, setNumAnswers] = useState(1);
+  const [answers, setAnswers] = useState([{ answerValue: null, cost: 0, isQuantifyable: false }]);
+  const [yesNoAnswer, setYesNoAnswer] = useState([
+    {
+      answerValue: "yes",
+      cost: 0,
+      isQuantifyable: false,
+    },
+    {
+      answerValue: "no",
+      cost: 0,
+      isQuantifyable: false,
+    },
+  ]);
+  
+
+  const handleYesNoQuantifiableCheck = (isChecked, label) => {
+    const answerData = [...yesNoAnswer];
+    const index = label === "yes" ? 0 : 1;
+    answerData[index] = {
+      ...answerData[index],
+      isQuantifyable: isChecked
+    };
+    setYesNoAnswer(answerData)
+  };
+
+  const handleYesNoCostCheck = (cost, label) => {
+    const answerData = [...yesNoAnswer];
+    const index = label === "yes" ? 0 : 1;
+    answerData[index] = {
+      ...answerData[index],
+      cost: cost,
+    };
+    setYesNoAnswer(answerData);
+  };
+
   const handleSubmit = async (e) => {
-    console.log("Submitted question:", questionText);
-    console.log("Question type:", questionType);
-    console.log("Number of answers:", numAnswers);
-    console.log("Answers:", answers);
     e.preventDefault();
 
-    // await axios.get("/questions-and-flows/get-all-questions").then((resp) => {
-    //   console.log(resp.data.data);
-    // });
-    let ans;
-    if (questionType === 'boolean') {
-      ans = [
-        {
-          answerValue: 'yes',
-        },
-        {
-          answerValue: 'no'
-        }
-      ];
-
-      setAnswers(ans);
+    if (questionText === "" || questionType === "") {
+      toast.error("Please add the details first.")
+      return;
     }
-    await axios
-      .post("/questions-and-flows/create-question", {
-        questionText: questionText,
-        questionType: questionType,
-        noOfPossibleAnswers: numAnswers,
-        possibleAnswers: ans,
-      })
-      .then((resp) => {
-        console.log(resp.data.data);
+
+
+    if (questionType === "boolean") {
+      const isCostMissing = yesNoAnswer.some((answer) => {
+        return answer.isQuantifyable && answer.cost === 0;
       });
+
+      if (isCostMissing) {
+        toast.error("Please specify cost for all quantifiable answers.", {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+        return; 
+      }
+
+      try {
+        await axios
+        .post("/questions-and-flows/create-question", {
+          questionText: questionText,
+          questionType: questionType,
+          noOfPossibleAnswers: 2,
+          possibleAnswers: yesNoAnswer,
+        })
+        .then((resp) => {
+          console.log(resp.data.data);
+        });
+      } catch (error) {
+        if (error.response && error.response.status === 500) {
+          toast.error("Something went wrong. Please try again later.");
+        }
+      }
+    } else {
+      const isCostMissing = answers.some((answer) => {
+        return answer.isQuantifyable && answer.cost === 0;
+      });
+
+      if (isCostMissing) {
+        toast.error("Please specify cost for all quantifiable answers.", {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+        return;
+      }
+
+      const somethingEmpty = answers.some((answer) => {
+        return answer.answerValue == null;
+      });
+
+      if (somethingEmpty) {
+        toast.error("Please add answers for all the possible options.", {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+        return;
+      }
+      try {
+        await axios
+          .post("/questions-and-flows/create-question", {
+            questionText: questionText,
+            questionType: questionType,
+            noOfPossibleAnswers: numAnswers,
+            possibleAnswers: answers,
+          })
+          .then((resp) => {
+            if (resp.status === 200) {
+              toast.success("Data added successfully!", {
+                position: "top-right",
+                autoClose: 2000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                onClose: clearValues(),
+              });
+              return;
+            }
+          });
+      } catch (error) {
+        if (error.response && error.response.status === 500) {
+          toast.error("Something went wrong. Please try again later.");
+        }
+      }
+    }
+    
   }
 
+  const clearValues = () => {
+    setQuestionType('');
+    setQuestionText("");
+    setAnswers([{ answerValue: null, cost: 0, isQuantifyable: false }]);
+    setNumAnswers(1);
+    setYesNoAnswer([
+    {
+      answerValue: "yes",
+      cost: 0,
+      isQuantifyable: false,
+    },
+    {
+      answerValue: "no",
+      cost: 0,
+      isQuantifyable: false,
+    },
+  ])
+  }
   const handleAnswerChange = (index, value) => {
     const newAnswers = [...answers];
-    newAnswers[index].answerValue = value;
+    newAnswers[index] = {
+      ...newAnswers[index],
+      answerValue: value
+    }
+    // newAnswers[index].answerValue = value;
     setAnswers(newAnswers);
   }
 
   const handleQuantifiableChange = (index) => {
     const newAnswers = [...answers];
-    newAnswers[index].isQuantifyable = !newAnswers[index].isQuantifyable;
+    newAnswers[index] = {
+      ...newAnswers[index],
+      isQuantifyable: !newAnswers[index].isQuantifyable,
+    };
+    // newAnswers[index].isQuantifyable = !newAnswers[index].isQuantifyable;
     setAnswers(newAnswers);
   }
+
+  const handleCostChange = (index, cost) => {
+    const newAnswers = [...answers];
+    newAnswers[index] = {
+      ...newAnswers[index],
+      cost: cost,
+    };
+    setAnswers(newAnswers);
+  }
+
+
   return (
     <>
+      <ToastContainer />
       {isOpen && (
         <>
           <div className="addQuestionModal">
@@ -66,7 +213,10 @@ const AddQuestionModal = ({ isOpen, onClose }) => {
 
             <div className="addQuestionModalContent">
               <div>
-                <Typography variant="h5" sx={{ marginTop: 2, fontWeight: 600 }}>
+                <Typography
+                  variant="h5"
+                  sx={{ marginTop: 2, fontWeight: 600, color: "#1B5180" }}
+                >
                   ADD NEW QUESTION
                 </Typography>
                 <form onSubmit={handleSubmit} className="formContent">
@@ -104,7 +254,74 @@ const AddQuestionModal = ({ isOpen, onClose }) => {
                       />
                     </RadioGroup>
                   </FormControl>
-
+                  {questionType === "boolean" && (
+                    <>
+                      <div className="yesNoSection">
+                        <div className="answerAndQuantity">
+                          <div className="quantifiableSection">
+                            <Typography variant="subtitle1">Yes</Typography>
+                            <FormControlLabel
+                              control={
+                                <Checkbox
+                                  checked={yesNoAnswer[0].isQuantifyable}
+                                  onChange={(e) =>
+                                    handleYesNoQuantifiableCheck(
+                                      e.target.checked,
+                                      "yes"
+                                    )
+                                  }
+                                />
+                              }
+                              label="Quantifiable"
+                            />
+                          </div>
+                          {yesNoAnswer[0].isQuantifyable && (
+                            <TextField
+                              type="number"
+                              label="Cost for Yes"
+                              value={yesNoAnswer[0].cost}
+                              onChange={(e) =>
+                                handleYesNoCostCheck(e.target.value, "yes")
+                              }
+                              margin="normal"
+                            />
+                          )}
+                        </div>
+                        <div className="answerAndQuantity">
+                          <div className="quantifiableSection">
+                            <Typography variant="subtitle1">
+                              No &nbsp;
+                            </Typography>
+                            <FormControlLabel
+                              control={
+                                <Checkbox
+                                  checked={yesNoAnswer[1].isQuantifyable}
+                                  onChange={(e) =>
+                                    handleYesNoQuantifiableCheck(
+                                      e.target.checked,
+                                      "no"
+                                    )
+                                  }
+                                />
+                              }
+                              label="Quantifiable"
+                            />
+                          </div>
+                          {yesNoAnswer[1].isQuantifyable && (
+                            <TextField
+                              type="number"
+                              label="Cost for No"
+                              value={yesNoAnswer[1].cost}
+                              onChange={(e) =>
+                                handleYesNoCostCheck(e.target.value, "no")
+                              }
+                              margin="normal"
+                            />
+                          )}
+                        </div>
+                      </div>
+                    </>
+                  )}
                   {questionType === "number" && (
                     <div>
                       <TextField
@@ -136,6 +353,17 @@ const AddQuestionModal = ({ isOpen, onClose }) => {
                             }
                             margin="normal"
                           />
+                          {answer.isQuantifyable && (
+                            <TextField
+                              type="number"
+                              label={`Cost for Answer ${index + 1}`}
+                              value={answer.cost} // Assuming answer has a cost property
+                              onChange={(e) =>
+                                handleCostChange(index, e.target.value)
+                              }
+                              margin="normal"
+                            />
+                          )}
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -180,6 +408,17 @@ const AddQuestionModal = ({ isOpen, onClose }) => {
                             }
                             margin="normal"
                           />
+                          {answer.isQuantifyable && (
+                            <TextField
+                              type="number"
+                              label={`Cost for Answer ${index + 1}`}
+                              value={answer.cost}
+                              onChange={(e) =>
+                                handleCostChange(index, e.target.value)
+                              }
+                              margin="normal"
+                            />
+                          )}
                           <FormControlLabel
                             control={
                               <Checkbox
