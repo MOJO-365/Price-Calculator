@@ -4,10 +4,10 @@ const userController = require("../controllers/user.js")
 const authController = require("../controllers/auth.js")
 
 const verifier = require("../utils/verifyToken.js")
-// import { verifyAdmin, verifyToken, verifyUser } from "../utils/verifyToken.js"
 
-//CREATE 
-router.post("/create-user", verifier.verifyToken, authController.register)
+
+//CREATE   
+router.post("/create-user", verifier.verifyToken, authController.register);
 
 //UPDATE
 router.put("/edit-user/:id", verifier.verifyToken, userController.updateUser);

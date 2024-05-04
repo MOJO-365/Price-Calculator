@@ -44,9 +44,26 @@ const QuestionSchema = new Schema(
       type: Number,
       require: true,
     },
-    possibleAnswers: [
-      PossibleAnswerSchema, 
-    ]
+    possibleAnswers: {
+      type: [PossibleAnswerSchema],
+
+      validate: {
+        validator: function (arr) {
+          
+          const answerValuesSet = new Set();
+          for (const possibleAnswer of arr) {
+            const { answerValue } = possibleAnswer;
+            
+            if (answerValuesSet.has(answerValue)) {
+              return false; 
+            }
+            answerValuesSet.add(answerValue); 
+          }
+          return true; 
+        },
+        message: 'Each `answerValue` in `possibleAnswers` must be unique.'
+      }
+    }
   },
   { timestamps: true }
 );
