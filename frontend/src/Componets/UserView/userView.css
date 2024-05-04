@@ -1,0 +1,143 @@
+.userView{
+  display: flex;
+}
+
+.centerFlowName{
+  width: 100%;
+  height: 55px;
+  background-color: #fff;
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+  border-bottom: 3px solid #ffe9ba97;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 19px;
+  font-weight: 650;
+  text-transform: uppercase;
+  color: var(--blue-mojo);
+}
+
+.leftView{
+  width: 50%;
+  height: 90vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.rightView{
+  width: 50%;
+  height: 90vh;
+  display: flex;
+  flex-direction: column;
+  /* justify-content: center; */
+  align-items: center;
+  margin-top: 5%;
+}
+
+.questionBox{
+  width: 90%;
+  height: 20%;
+  background-color: #fff;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 5px 0px, rgba(0, 0, 0, 0.1) 0px 0px 1px 0px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 5px;
+  color: var(--blue-mojo);
+  word-wrap: break-word;
+  overflow: auto;
+}
+
+
+.answerGrid{
+  width: 90%;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); 
+  gap: 10px;
+  place-items: center;
+  margin-top: 15px;
+}
+
+.answerGrid2{
+  width: 90%;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); 
+  gap: 10px;
+  place-items: center;
+  margin-top: 15px;
+}
+
+.grid-item {
+  width: 200px; 
+  height: 100px; 
+  padding: 10px;
+  background-color: #ffffff; 
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 5px 0px, rgba(0, 0, 0, 0.1) 0px 0px 1px 0px;
+  display: flex;
+  align-items: center;
+  justify-content: center; 
+  border: 1px solid #2574b921;
+  overflow: auto;
+
+}
+
+.bottomBtn{
+  width: 90%;
+  display: flex;
+  justify-content: end;
+  align-items: end;
+  margin-top: 30px;
+  /* margin-right: 10px; */
+}
+
+.bottomBtn > button{
+  background: transparent;
+  border: none;
+  background-color: var(--blue-mojo);
+  padding: 5px 10px;
+  border-radius: 3px;
+  color: var(--yellow-mojo); 
+  font-size: 15px;
+  outline: none;
+}
+
+/* .rightCostTable{
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+} */
+.rightView > p{
+  font-size: 20px;
+  font-weight: 650;
+  color: var(--blue-mojo);
+  text-transform: uppercase;
+}
+
+.totalCostTable{
+  width: 80%;
+  border-collapse: collapse;
+  /* table-layout: fixed;  */
+}
+
+.totalCostTable th {
+  /* border: 1px solid transparent; */
+  /* padding: 8px; */
+  text-align: center;
+  width: 100px;
+  font-size: 17px;
+  color: var(--blue-mojo);
+}
+
+.totalCostTable td{
+  max-width: 100px;
+
+  /* border: 1px solid transparent; */
+  padding: 6px;
+  text-align: center;
+  word-wrap: break-word;
+}
+

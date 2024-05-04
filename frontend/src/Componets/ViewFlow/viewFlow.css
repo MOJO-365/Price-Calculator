@@ -1,0 +1,54 @@
+.viewFlows{
+  padding: 100px 40px;
+}
+
+.flowSectionDiv{
+  background-color: #fff;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+  padding: 20px;
+  border: 3px solid #63a9e727;
+  overflow: auto;
+  height: 150px;
+  width: 85%;
+  position: relative;
+}
+
+.row1{
+  display: flex;
+  justify-content: space-between;
+}
+.row1 > p{
+  margin: 0;
+  font-size: 15px;
+  /* font-weight: 60; */
+  margin-bottom: 5px;
+  font-family: "Poppins", sans-serif;
+  font-weight: 550;
+  font-style: normal;
+  letter-spacing: 1.2px;
+  /* overflow: ; */
+}
+
+.rightBottomDiv{
+  position: absolute;
+  bottom: 20px;
+  right: 15px;
+  display: flex;
+  gap: 5px;
+}
+
+.rightBottomDiv > button{
+  background-color: transparent;
+  border: none;
+  background-color: #63a9e727;
+  padding: 5px 10px;
+  font-size: 12px;
+  color: #074376;
+  font-weight: 500;
+  border-radius: 2px;
+}
+/* .questionBtnDiv{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+} */

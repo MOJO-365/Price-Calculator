@@ -1,0 +1,16 @@
+.viewEditModal{
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 55%;
+  height: 80%;
+  transform: translate(-50%,-50%);
+  z-index: 1500;
+  background-color: #fff;
+  border-radius: 5px;
+  text-align: center;
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+  overflow: auto;
+  /* overflow-x: hidden;/ */
+  padding: 20px;
+}

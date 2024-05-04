@@ -1,16 +1,21 @@
-import "./addQuestionModal.css";
-// import TextField from "@mui/material/TextField";
+import "./editModal.css";
 import { TextField, RadioGroup, Radio, FormControlLabel, Button, FormControl, FormLabel, Typography, Checkbox } from '@mui/material';
 import { useState } from "react";
-import axios from "../../../axiosConfig";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import axios from "../../../axiosConfig";
+const EditModal = ({ isOpen, onClose, questionData }) => {
 
-const AddQuestionModal = ({ isOpen, onClose }) => {
-  const [questionText, setQuestionText] = useState("");
-  const [questionType, setQuestionType] = useState('');
-  const [numAnswers, setNumAnswers] = useState(1);
-  const [answers, setAnswers] = useState([{ answerValue: null, cost: 0, isQuantifyable: false }]);
+  const [qData, setQData] = useState(questionData);
+  const [questionText, setQuestionText] = useState(questionData.questionText);
+  const [questionType, setQuestionType] = useState(questionData.questionType === 'integer' ?  'number' : questionData.questionType);
+  const [numAnswers, setNumAnswers] = useState(questionData.noOfPossibleAnswers);
+  const [answers, setAnswers] = useState(questionData.possibleAnswers);
+
+  // console.log(questionText)
+  // console.log(questionType);
+  // console.log(numAnswers);
+  // console.log(answers);
   const [yesNoAnswer, setYesNoAnswer] = useState([
     {
       answerValue: "yes",
@@ -23,16 +28,15 @@ const AddQuestionModal = ({ isOpen, onClose }) => {
       isQuantifyable: false,
     },
   ]);
-  
 
   const handleYesNoQuantifiableCheck = (isChecked, label) => {
     const answerData = [...yesNoAnswer];
     const index = label === "yes" ? 0 : 1;
     answerData[index] = {
       ...answerData[index],
-      isQuantifyable: isChecked
+      isQuantifyable: isChecked,
     };
-    setYesNoAnswer(answerData)
+    setYesNoAnswer(answerData);
   };
 
   const handleYesNoCostCheck = (cost, label) => {
@@ -49,40 +53,40 @@ const AddQuestionModal = ({ isOpen, onClose }) => {
     e.preventDefault();
 
     if (questionText === "" || questionType === "") {
-      toast.error("Please add the details first.")
+      toast.error("Please add the details first.");
       return;
     }
 
-
     if (questionType === "boolean") {
-      // const isCostMissing = yesNoAnswer.some((answer) => {
-      //   return answer.isQuantifyable && answer.cost === 0;
-      // });
+      const isCostMissing = yesNoAnswer.some((answer) => {
+        return answer.isQuantifyable && answer.cost === 0;
+      });
 
-      // if (isCostMissing) {
-      //   toast.error("Please specify cost for all quantifiable answers.", {
-      //     position: "top-right",
-      //     autoClose: 2000,
-      //     hideProgressBar: false,
-      //     closeOnClick: true,
-      //     pauseOnHover: true,
-      //     draggable: true,
-      //     progress: undefined,
-      //   });
-      //   return; 
-      // }
+      if (isCostMissing) {
+        toast.error("Please specify cost for all quantifiable answers.", {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+        return;
+      }
 
       try {
         await axios
-        .post("/questions-and-flows/create-question", {
-          questionText: questionText,
-          questionType: questionType,
-          noOfPossibleAnswers: 2,
-          possibleAnswers: yesNoAnswer,
-        })
-        .then((resp) => {
+          .put(`/questions-and-flows/update-question/${questionData._id}`, {
+            questionText: questionText,
+            questionType: questionType,
+            noOfPossibleAnswers: 2,
+            possibleAnswers: yesNoAnswer,
+          })
+          .then((resp) => {
+            console.log(resp.data.data);
             if (resp.status === 200) {
-              toast.success("Data added successfully!", {
+              toast.success("Data edited successfully!", {
                 position: "top-right",
                 autoClose: 2000,
                 hideProgressBar: false,
@@ -93,33 +97,33 @@ const AddQuestionModal = ({ isOpen, onClose }) => {
                 onClose: clearValues(),
               });
               return;
-            }
-        });
+            } 
+          });
       } catch (error) {
         if (error.response && error.response.status === 500) {
           toast.error("Something went wrong. Please try again later.");
         }
       }
     } else {
-      // const isCostMissing = answers.some((answer) => {
-      //   return answer.isQuantifyable && answer.cost === 0;
-      // });
+      const isCostMissing = answers.some((answer) => {
+        return answer.isQuantifyable && answer.cost === 0;
+      });
 
-      // if (isCostMissing) {
-      //   toast.error("Please specify cost for all quantifiable answers.", {
-      //     position: "top-right",
-      //     autoClose: 2000,
-      //     hideProgressBar: false,
-      //     closeOnClick: true,
-      //     pauseOnHover: true,
-      //     draggable: true,
-      //     progress: undefined,
-      //   });
-      //   return;
-      // }
+      if (isCostMissing) {
+        toast.error("Please specify cost for all quantifiable answers.", {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+        return;
+      }
 
       const somethingEmpty = answers.some((answer) => {
-        return answer.answerValue == null || answer.answerValue == "";
+        return answer.answerValue == null;
       });
 
       if (somethingEmpty) {
@@ -136,15 +140,16 @@ const AddQuestionModal = ({ isOpen, onClose }) => {
       }
       try {
         await axios
-          .post("/questions-and-flows/create-question", {
+          .put(`/questions-and-flows/update-question/${questionData._id}`, {
             questionText: questionText,
             questionType: questionType,
             noOfPossibleAnswers: numAnswers,
             possibleAnswers: answers,
           })
           .then((resp) => {
+            console.log(resp.data.data);
             if (resp.status === 200) {
-              toast.success("Data added successfully!", {
+              toast.success("Data edited successfully!", {
                 position: "top-right",
                 autoClose: 2000,
                 hideProgressBar: false,
@@ -163,36 +168,35 @@ const AddQuestionModal = ({ isOpen, onClose }) => {
         }
       }
     }
-    
-  }
+  };
 
   const clearValues = () => {
-    setQuestionType('');
+    setQuestionType("");
     setQuestionText("");
     setAnswers([{ answerValue: null, cost: 0, isQuantifyable: false }]);
     setNumAnswers(1);
     setYesNoAnswer([
-    {
-      answerValue: "yes",
-      cost: 0,
-      isQuantifyable: false,
-    },
-    {
-      answerValue: "no",
-      cost: 0,
-      isQuantifyable: false,
-    },
-  ])
-  }
+      {
+        answerValue: "yes",
+        cost: 0,
+        isQuantifyable: false,
+      },
+      {
+        answerValue: "no",
+        cost: 0,
+        isQuantifyable: false,
+      },
+    ]);
+  };
   const handleAnswerChange = (index, value) => {
     const newAnswers = [...answers];
     newAnswers[index] = {
       ...newAnswers[index],
-      answerValue: value
-    }
+      answerValue: value,
+    };
     // newAnswers[index].answerValue = value;
     setAnswers(newAnswers);
-  }
+  };
 
   const handleQuantifiableChange = (index) => {
     const newAnswers = [...answers];
@@ -202,7 +206,7 @@ const AddQuestionModal = ({ isOpen, onClose }) => {
     };
     // newAnswers[index].isQuantifyable = !newAnswers[index].isQuantifyable;
     setAnswers(newAnswers);
-  }
+  };
 
   const handleCostChange = (index, cost) => {
     const newAnswers = [...answers];
@@ -211,26 +215,25 @@ const AddQuestionModal = ({ isOpen, onClose }) => {
       cost: cost,
     };
     setAnswers(newAnswers);
-  }
+  };
 
 
   return (
     <>
-      <ToastContainer />
       {isOpen && (
         <>
-          <div className="addQuestionModal">
+          <ToastContainer />
+          <div className="editModalContent">
             <div className="closingModalDiv" onClick={onClose}>
               <span> &times;</span>
             </div>
-
             <div className="addQuestionModalContent">
               <div>
                 <Typography
                   variant="h5"
                   sx={{ marginTop: 2, fontWeight: 600, color: "#1B5180" }}
                 >
-                  ADD NEW QUESTION
+                  EDIT QUESTION
                 </Typography>
                 <form onSubmit={handleSubmit} className="formContent">
                   <TextField
@@ -288,7 +291,7 @@ const AddQuestionModal = ({ isOpen, onClose }) => {
                               label="Quantifiable"
                             />
                           </div>
-                          {/* {yesNoAnswer[0].isQuantifyable && ( */}
+                          {yesNoAnswer[0].isQuantifyable && (
                             <TextField
                               type="number"
                               label="Cost for Yes"
@@ -298,7 +301,7 @@ const AddQuestionModal = ({ isOpen, onClose }) => {
                               }
                               margin="normal"
                             />
-                          {/* )} */}
+                          )}
                         </div>
                         <div className="answerAndQuantity">
                           <div className="quantifiableSection">
@@ -320,7 +323,7 @@ const AddQuestionModal = ({ isOpen, onClose }) => {
                               label="Quantifiable"
                             />
                           </div>
-                          {/* {yesNoAnswer[1].isQuantifyable && ( */}
+                          {yesNoAnswer[1].isQuantifyable && (
                             <TextField
                               type="number"
                               label="Cost for No"
@@ -330,7 +333,7 @@ const AddQuestionModal = ({ isOpen, onClose }) => {
                               }
                               margin="normal"
                             />
-                          {/* )} */}
+                          )}
                         </div>
                       </div>
                     </>
@@ -346,7 +349,7 @@ const AddQuestionModal = ({ isOpen, onClose }) => {
                           setNumAnswers(count);
                           setAnswers(
                             Array.from({ length: count }, () => ({
-                              answerValue: null,
+                              answerValue: "",
                               isQuantifyable: false,
                             }))
                           );
@@ -366,7 +369,7 @@ const AddQuestionModal = ({ isOpen, onClose }) => {
                             }
                             margin="normal"
                           />
-                          {/* {answer.isQuantifyable && ( */}
+                          {answer.isQuantifyable && (
                             <TextField
                               type="number"
                               label={`Cost for Answer ${index + 1}`}
@@ -376,7 +379,7 @@ const AddQuestionModal = ({ isOpen, onClose }) => {
                               }
                               margin="normal"
                             />
-                          {/* )} */}
+                          )}
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -421,7 +424,7 @@ const AddQuestionModal = ({ isOpen, onClose }) => {
                             }
                             margin="normal"
                           />
-                          {/* {answer.isQuantifyable && ( */}
+                          {answer.isQuantifyable && (
                             <TextField
                               type="number"
                               label={`Cost for Answer ${index + 1}`}
@@ -431,7 +434,7 @@ const AddQuestionModal = ({ isOpen, onClose }) => {
                               }
                               margin="normal"
                             />
-                          {/* )} */}
+                          )}
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -460,7 +463,23 @@ const AddQuestionModal = ({ isOpen, onClose }) => {
                     }}
                     // onClick={openQuestionModalFunction}
                   >
-                    Submit
+                    SAVE
+                  </Button>
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    sx={{
+                      backgroundColor: "#F8B31C",
+                      color: "#1B5180",
+                      "&:hover": {
+                        backgroundColor: "#1B5180",
+                        color: "#F8B31C",
+                      },
+                      mx: 1,
+                    }}
+                    onClick={() => onClose()}
+                  >
+                    DISCARD
                   </Button>
                 </form>
               </div>
@@ -472,4 +491,4 @@ const AddQuestionModal = ({ isOpen, onClose }) => {
   );
 }
 
-export default AddQuestionModal;
+export default EditModal;

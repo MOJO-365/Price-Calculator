@@ -10,6 +10,7 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import Button from "@mui/material/Button";
 import ViewAnswerModal from "./ViewAnswerModal";
+import EditModal from "./EditModal/EditModal";
 
 const ViewQuestions = () => {
   const [questions, setQuestions] = useState([]);
@@ -17,6 +18,7 @@ const ViewQuestions = () => {
   const [answerModal, setAnswerModal] = useState(false);
   const [viewQuestionIndex, setViewQuestionIndex] = useState(0);
   const [deleteIndex, setDeleteIndex] = useState(0);
+  const [editModal, setEditModal] = useState(false);
   const getAllQuestions = async () => {
     await axios.get("/questions-and-flows/get-all-questions").then((resp) => {
       console.log(resp.data.data[0]);
@@ -34,9 +36,11 @@ const ViewQuestions = () => {
     await axios.delete(`/questions-and-flows/delete-question/${idx}`).then((resp) => {
       if (resp.data.message === "success") {
         closeDeleteDialog();
+        getAllQuestions();
       } else {
         alert("Delete Error!")
         closeDeleteDialog();
+        getAllQuestions();
       }
     });
   }
@@ -55,6 +59,13 @@ const ViewQuestions = () => {
   const openAnswerModal = () => {
     setAnswerModal(true);
   }
+  const closeEditModal = () => {
+    setEditModal(false);
+  };
+
+  const openEditModal = () => {
+    setEditModal(true);
+  };
   return (
     <>
       <div className="viewQues">
@@ -72,14 +83,30 @@ const ViewQuestions = () => {
                   </div>
 
                   <div className="rightBottomDiv">
-                    <button onClick={() => {
-                      setViewQuestionIndex(index)
-                      openAnswerModal()
-                    }}>View Answers</button>
-                    <button onClick={() => {
-                      setDeleteIndex(index);
-                      openDeleteDialog();
-                    }}>Delete</button>
+                    <button
+                      onClick={() => {
+                        setViewQuestionIndex(index);
+                        openAnswerModal();
+                      }}
+                    >
+                      View Answers
+                    </button>
+                    <button
+                      onClick={() => {
+                        setDeleteIndex(index);
+                        openEditModal();
+                      }}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => {
+                        setDeleteIndex(index);
+                        openDeleteDialog();
+                      }}
+                    >
+                      Delete
+                    </button>
                   </div>
                 </div>
               </Grid>
@@ -87,21 +114,20 @@ const ViewQuestions = () => {
         </Grid>
 
         {answerModal && (
-            <ViewAnswerModal
-              isOpen={openAnswerModal}
-              onClose={closeAnswerModal}
-              answers={questions[viewQuestionIndex].possibleAnswers}
-            />
-          )}
+          <ViewAnswerModal
+            isOpen={openAnswerModal}
+            onClose={closeAnswerModal}
+            answers={questions[viewQuestionIndex].possibleAnswers}
+          />
+        )}
 
-          {/* {editSupplierModal && (
-            <EditSupplierDetails
-              isOpen={openEditSupplierModal}
-              onClose={closeEditSupplierModal}
-              allRawMaterials={rawMaterials}
-              supplierDetails={questions[supplierSelected]}
-            />
-          )} */}
+        {editModal && (
+          <EditModal
+            isOpen={openEditModal}
+            onClose={closeEditModal}
+            questionData={questions[deleteIndex]}
+          />
+        )}
 
         <Dialog
           open={deleteDialog}
@@ -120,16 +146,8 @@ const ViewQuestions = () => {
             </DialogContentText>
           </DialogContent>
           <DialogActions>
-            <Button
-            onClick={closeDeleteDialog}
-            >
-              Disagree
-            </Button>
-            <Button
-            onClick={handleDelete}
-            >
-              Agree
-            </Button>
+            <Button onClick={closeDeleteDialog}>Disagree</Button>
+            <Button onClick={handleDelete}>Agree</Button>
           </DialogActions>
         </Dialog>
       </div>

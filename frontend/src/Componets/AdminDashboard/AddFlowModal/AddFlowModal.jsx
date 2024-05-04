@@ -12,7 +12,10 @@ const AddFlowModal = ({ isOpen, onClose }) => {
   const [selectedOptions, setSelectedOptions] = useState([]);
   const [connections, setConnections] = useState({});
   const [rootIndex, setRootIndex] = useState(-1);
-  const [leafIndex, setLeafIndex] = useState(-1);
+  const [leafIndex, setLeafIndex] = useState({
+    questionid: null,
+    answerValue: null
+  });
   const [disableStart, setDisableStart] = useState(false);
   // const [questions, setQuestions] = useState([
   //   {
@@ -49,15 +52,13 @@ const AddFlowModal = ({ isOpen, onClose }) => {
   // ]);
   const [questions, setQuestions] = useState([])
   const [flowList, setFlowList] = useState([]);
-  const [flow, setFlow] = useState([{
-
-  }])
+  
   useEffect(() => {
     const getAllQuestions = async () => {
         await axios
           .get("/questions-and-flows/get-all-questions")
           .then((resp) => {
-            // console.log(resp.data.data);
+            console.log(resp.data.data);
             setQuestions(resp.data.data)
           });
   }
@@ -65,17 +66,18 @@ const AddFlowModal = ({ isOpen, onClose }) => {
     getAllQuestions();
   }, [])
   const handleNext = () => {
-    if (flowname === "" && selectedOptions.length === 0) {
-      alert("You'll need to enter the details");
-      return;
-    }
-    else if (flowname === "") {
-      alert("Enter the flow name first!");
-      return;
-    } else if (selectedOptions.length === 0) {
-      alert("Select the questions First!");
-      return;
-    } setStep(step + 1);
+    // if (flowname === "" && selectedOptions.length === 0) {
+    //   alert("You'll need to enter the details");
+    //   return;
+    // }
+    // else if (flowname === "") {
+    //   alert("Enter the flow name first!");
+    //   return;
+    // } else if (selectedOptions.length === 0) {
+    //   alert("Select the questions First!");
+    //   return;
+    // }
+    setStep(step + 1);
   }
 
   const handlePrevious = () => {
@@ -83,13 +85,13 @@ const AddFlowModal = ({ isOpen, onClose }) => {
   }
 
   const handleFinish = async () => {
-    // if (flowname === "" && selectedOptions.length === 0) {
-    //   alert("You'll need to start from slide 1")
-    // }
-    // if (flowname === "") {
-    //   alert("Enter the flow name first!")
-    //   return;
-    // }
+    if (flowname === "" && selectedOptions.length === 0) {
+      alert("You'll need to start from slide 1")
+    }
+    if (flowname === "") {
+      alert("Enter the flow name first!")
+      return;
+    }
     console.log(flowList)
     // const arrayOfFlows = Object.values(flowList);
     await axios
@@ -168,12 +170,45 @@ const AddFlowModal = ({ isOpen, onClose }) => {
     }
   }
   
-  const handleLeafIndex = (id) => {
+  const handleLeafIndex = (id, answer, indexFromQues) => {
     
-    if (leafIndex === -1) {
-      setLeafIndex(id)
+    // if (leafIndex === -1) {
+    //   setLeafIndex(id)
+    // } else {
+    //   setLeafIndex(-1);
+    // }
+
+    if (leafIndex.questionid === null && leafIndex.answerValue === null) {
+      const obj = {
+        questionid: id,
+        answerValue: answer
+      }
+      setLeafIndex(obj);
+      const flowListArray = [...flowList];
+      const idx = flowListArray.findIndex((obj) => obj.currQuestionId === id);
+      if (idx != -1) {
+        flowListArray[idx].nextQuestionId = null;
+        setFlowList(flowListArray);
+      } else {
+        const obj = {
+          flowName: flowname,
+          currQuestionId: id,
+          answerValue: answer,
+          nextQuestionId: null,
+          isRoot: rootIndex === indexFromQues ? true : false,
+        };
+
+        flowListArray.push(obj);
+        setFlowList(flowListArray);
+      }
+
     } else {
-      setLeafIndex(-1);
+      const obj = {
+        questionid: null,
+        answerValue: null,
+      };
+
+      setLeafIndex(obj);
     }
   };
   
@@ -297,6 +332,7 @@ const AddFlowModal = ({ isOpen, onClose }) => {
                           fontSize: "15px",
                           textTransform: "uppercase",
                           fontWeight: "bold",
+                          textAlign: "center",
                         }}
                       >
                         Select Start Question
@@ -306,6 +342,7 @@ const AddFlowModal = ({ isOpen, onClose }) => {
                           fontSize: "15px",
                           textTransform: "uppercase",
                           fontWeight: "bold",
+                          textAlign: "center",
                         }}
                       >
                         Question
@@ -315,6 +352,7 @@ const AddFlowModal = ({ isOpen, onClose }) => {
                           fontSize: "15px",
                           textTransform: "uppercase",
                           fontWeight: "bold",
+                          textAlign: "center",
                         }}
                       >
                         Question Type
@@ -324,6 +362,7 @@ const AddFlowModal = ({ isOpen, onClose }) => {
                           fontSize: "15px",
                           textTransform: "uppercase",
                           fontWeight: "bold",
+                          textAlign: "center",
                         }}
                       >
                         Possible Answers
@@ -333,11 +372,31 @@ const AddFlowModal = ({ isOpen, onClose }) => {
                           fontSize: "15px",
                           textTransform: "uppercase",
                           fontWeight: "bold",
+                          textAlign: "center",
+                        }}
+                      >
+                        Cost
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          fontSize: "15px",
+                          textTransform: "uppercase",
+                          fontWeight: "bold",
+                          textAlign: "center",
                         }}
                       >
                         Select Next Question
                       </TableCell>
-                      {/* <TableCell>Select End Question</TableCell> */}
+                      <TableCell
+                        sx={{
+                          fontSize: "15px",
+                          textTransform: "uppercase",
+                          fontWeight: "bold",
+                          textAlign: "center",
+                        }}
+                      >
+                        Select End Question
+                      </TableCell>
                     </TableRow>
                   </TableHead>
                   {/* <TableBody>
@@ -414,7 +473,10 @@ const AddFlowModal = ({ isOpen, onClose }) => {
                               <TableCell>{question.questionText}</TableCell>
                               <TableCell>{question.questionType}</TableCell>
                               <TableCell>
-                                {/* {question.possibleAnswers[subIndex].answerValue} */}
+                                {question.possibleAnswers[subIndex].answerValue}
+                              </TableCell>
+                              <TableCell>
+                                {question.possibleAnswers[subIndex].cost}
                               </TableCell>
                               <TableCell>
                                 {
@@ -469,20 +531,20 @@ const AddFlowModal = ({ isOpen, onClose }) => {
                                     ))}
                                 </Select> */}
                               </TableCell>
-                              {/* <TableCell>
+                              <TableCell>
                                 <button
                                   className={
                                     leafIndex === -1
                                       ? "startEndBtn"
                                       : "startEndBtn startEndBtnSelected"
                                   }
-                                  onClick={() => handleLeafIndex(question._id)}
+                                  onClick={() => handleLeafIndex(question._id, question.possibleAnswers[subIndex].answerValue, index)}
                                 >
-                                  {leafIndex === question._id
+                                  {leafIndex.questionid === question._id && leafIndex.answerValue === question.possibleAnswers[subIndex].answerValue 
                                     ? "SELECTED"
                                     : "SELECT END"}
                                 </button>
-                              </TableCell> */}
+                              </TableCell>
                             </TableRow>
                           </>
                         ))

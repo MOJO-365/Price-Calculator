@@ -139,14 +139,25 @@ const ManageUsers = ({ isOpen, onClose }) => {
     closeDeleteDialog();
   }
   const getAllUsers = async () => {
-    await axios.get("/users/get-users/").then((resp) => {
-      if (resp.status === 200) {
-        const data = resp.data;
-        const nonAdminUsers = data.filter((user) => !user.isAdmin);
-        setUsersData(nonAdminUsers);
-        setEditData(nonAdminUsers);
-      }
-    });
+    const cookieName = "access_token";
+    const cookieValue = document.cookie
+        .split("; ")
+      .find((row) => row.startsWith(`${cookieName}=`));
+    console.log(cookieValue)
+    // if (cookieValue) {
+      await axios
+      .get("/users/get-users/", {
+      })
+      .then((resp) => {
+        if (resp.status === 200) {
+          const data = resp.data;
+          const nonAdminUsers = data.filter((user) => !user.isAdmin);
+          setUsersData(nonAdminUsers);
+          setEditData(nonAdminUsers);
+        }
+      });
+    // }
+    
   };
 
 

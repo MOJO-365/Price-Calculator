@@ -19,7 +19,7 @@ import { useNavigate } from "react-router-dom";
 
 
 const drawerWidth = 240;
-const navItems = ["Home", "View Flow", "View Questions"];
+const navItems = ["Home", "View Flows", "View Questions", "Flow Layout"];
 const theme = createTheme({
   palette: {
     primary: {
@@ -94,8 +94,12 @@ const Navbar = (props) => {
                   onClick={() => {
                     if (item === "View Questions") {
                       navigate("/viewquestions");
-                    } else {
-                      navigate("/new");
+                    } else if (item === "View Flows") {
+                      navigate("/viewflows");
+                    } else if (item === "Home") {
+                      navigate("/dashboard");
+                    } else if (item === "Flow Layout") {
+                      navigate("/selectflow")
                     }
                   }}
                 >

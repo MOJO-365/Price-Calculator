@@ -37,7 +37,8 @@ const Signin = () => {
           const token = resp.data.access_token;
           const cookieName = "access_token";
           const expiryDate = new Date();
-          expiryDate.setFullYear(expiryDate.getFullYear() + 1);
+          expiryDate.setHours(expiryDate.getHours() + 1); 
+          expiryDate.setMinutes(expiryDate.getMinutes() + 50); 
           const expires = expiryDate.toUTCString();
           document.cookie = `${cookieName}=${token}; expires=${expires} path=/`;
           toast.success("Logging in...", {
@@ -49,7 +50,7 @@ const Signin = () => {
             draggable: true,
             progress: undefined,
             onClose: () => {
-              navigate("/");
+              navigate("/dashboard");
             },
           });
         } else {
