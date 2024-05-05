@@ -216,9 +216,9 @@ const AddFlowModal = ({ isOpen, onClose }) => {
 
     const contains = flowList.findIndex(
       (obj) =>
-        obj.currQuestionId === questions[index]._id &&
+        obj.currQuestionId === selectedOptions[index]._id &&
         obj.answerValue.toLowerCase() ===
-          questions[index].possibleAnswers[subIndex].answerValue.toLowerCase()
+          selectedOptions[index].possibleAnswers[subIndex].answerValue.toLowerCase()
     );
     if (contains !== -1) {
       // console.log("Contains: ",contains)
@@ -252,8 +252,8 @@ const AddFlowModal = ({ isOpen, onClose }) => {
     } else {
       const obj = {
         flowName: flowname,
-        currQuestionId: questions[index]._id,
-        answerValue: questions[index].possibleAnswers[subIndex].answerValue,
+        currQuestionId: selectedOptions[index]._id,
+        answerValue: selectedOptions[index].possibleAnswers[subIndex].answerValue,
         nextQuestionId: newValue.value,
         isRoot: rootIndex === index ? true : false,
       };

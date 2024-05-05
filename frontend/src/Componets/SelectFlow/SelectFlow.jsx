@@ -34,6 +34,7 @@ const SelectFlow = () => {
   }, []);
 
   const handleOnChange = (event, newValue) => {
+    console.log(newValue)
     if (newValue) {
       setSelectedId(newValue);
     } else {
