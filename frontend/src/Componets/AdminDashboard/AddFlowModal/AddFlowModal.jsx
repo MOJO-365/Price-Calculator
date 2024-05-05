@@ -100,6 +100,7 @@ const AddFlowModal = ({ isOpen, onClose }) => {
       })
       .then((resp) => {
         console.log(resp.data.data);
+        
       });
 
     onClose();

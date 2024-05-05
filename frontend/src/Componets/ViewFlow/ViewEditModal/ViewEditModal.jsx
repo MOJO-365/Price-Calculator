@@ -6,7 +6,7 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, FormC
 import Autocomplete from "@mui/material/Autocomplete";
 
 const ViewEditModal = ({ isOpen, onClose, flowSelected }) => {
-  console.log("flow:",flowSelected)
+  // console.log("flow:",flowSelected)
   const [step, setStep] = useState(1);
   const [questions, setQuestions] = useState([]);
   const [selectedOptions, setSelectedOptions] = useState([]);
@@ -77,6 +77,8 @@ const ViewEditModal = ({ isOpen, onClose, flowSelected }) => {
     questionid: null,
     answerValue: null,
   });
+
+  const [editFlow, setEditFlow] = useState([]);
   // let objLeaf = null;
   const getAllQuestions = async () => {
     await axios.get("/questions-and-flows/get-all-questions").then((resp) => {
@@ -95,7 +97,7 @@ const ViewEditModal = ({ isOpen, onClose, flowSelected }) => {
           questionIds.includes(question._id)
         );
         setSelectedOptions(filteredQuestions);
-
+        // console.error("ff", filteredQuestions)
         const questionIdWithIsRootTrue = flowData.find((item) => item.isRoot);
 
         const questionIdWithNextNull = flowData.find(
@@ -123,8 +125,16 @@ const ViewEditModal = ({ isOpen, onClose, flowSelected }) => {
     });
   };
 
+  const getFlowByFlowName = async () => {
+    await axios.post(`/questions-and-flows/get-flow/${flowSelected._id}`).then((resp) => {
+      if (resp.status === 200) {
+        setEditFlow(resp.data.data);
+      }
+    });
+  }
   useEffect(() => {
     getAllQuestions();
+    getFlowByFlowName();
   }, []);
 
   const handleNext = () => {
@@ -157,24 +167,49 @@ const ViewEditModal = ({ isOpen, onClose, flowSelected }) => {
   const handleStartClick = (index) => {
     if (rootIndex === -1) {
       setRootIndex(index);
+      // console.error("here")
       const flowListArray = [...flowData];
+      const editFlowArray = [...editFlow];
       flowListArray.map((obj) => {
-        if (obj.currQuestionId === questions[index]._id) {
+        // console.error("innnn")
+        // console.error(obj.currQuestionId === selectedOptions[index]._id);
+        if (obj.currQuestionId === selectedOptions[index]._id) {
+          obj.isRoot = true;
+        }
+      });
+
+      // console.error("edit:", editFlowArray)
+      editFlowArray.map((obj) => {
+        // console.error(obj.currQuestionId === selectedOptions[index]._id);
+        // console.error(obj.currQuestionId);
+        // console.error("sel: ",selectedOptions[index]._id);
+        
+        if (obj.currQuestionId === selectedOptions[index]._id) {
+          // console.error(obj)
           obj.isRoot = true;
         }
       });
       setFlowData(flowListArray);
+      setEditFlow(editFlowArray);
       // setDisableStart(true)
     } else {
       setRootIndex(-1);
       const flowListArray = [...flowData];
+      const editFlowArray = [...editFlow];
       flowListArray.forEach((obj) => {
-        if (obj.currQuestionId === questions[index]._id) {
-          console.log("here");
+        if (obj.currQuestionId === selectedOptions[index]._id) {
+          // console.error(obj);
           obj.isRoot = false;
         }
       });
-      flowData(flowListArray);
+      editFlowArray.forEach((obj) => {
+        if (obj.currQuestionId === selectedOptions[index]._id) {
+          // console.error(obj);
+          obj.isRoot = false;
+        }
+      });
+      setFlowData(flowListArray);
+      setEditFlow(editFlowArray);
     }
   };
 
@@ -213,37 +248,95 @@ const ViewEditModal = ({ isOpen, onClose, flowSelected }) => {
   };
 
   const handleAddFlow = async (index, subIndex, newValue) => {
+    // console.error(flowData[0])
     const contains = flowData.findIndex(
       (obj) =>
-        obj.currQuestionId === questions[index]._id &&
+        obj.currQuestionId === selectedOptions[index]._id &&
         obj.answerValue ===
-          questions[index].possibleAnswers[subIndex].answerValue
+          selectedOptions[index].possibleAnswers[subIndex].answerValue
     );
     if (contains !== -1) {
       // console.log("Contains: ",contains)
       const flowListArray = [...flowData];
       flowListArray[contains].flowName = flowname;
       flowListArray[contains].nextQuestionId = newValue.value;
+      const ques = questions.find((obj) => obj._id === newValue.value)
+      flowListArray[contains].nextQuestion = ques;
       flowListArray[contains].isRoot = rootIndex === index ? true : false;
       setFlowData(flowListArray);
+      // console.error(flowData);
 
-      console.error(flowData);
+      // updating in edit flow
+      const idx = editFlow.findIndex(
+      (obj) =>
+        obj.currQuestionId === selectedOptions[index]._id &&
+        obj.answerValue ===
+          selectedOptions[index].possibleAnswers[subIndex].answerValue
+      );
+      const editFlowArray = [...editFlow];
+      editFlowArray[idx].flowName = flowname;
+      editFlowArray[idx].nextQuestionId = newValue.value;
+      editFlowArray[idx].isRoot = rootIndex === index ? true : false;
+      setEditFlow(editFlowArray);
+      // console.error(editFlowArray);
       return;
     } else {
+      const ques1 = questions.find(
+        (obj) => obj._id === selectedOptions[index]._id
+      );
+      const ques2 = questions.find((obj) => obj._id === newValue.value);
       const obj = {
         flowName: flowname,
-        currQuestionId: questions[index]._id,
-        answerValue: questions[index].possibleAnswers[subIndex].answerValue,
+        currQuestionId: selectedOptions[index]._id,
+        currQuestion: ques1,
+        answerValue:
+          selectedOptions[index].possibleAnswers[subIndex].answerValue,
         nextQuestionId: newValue.value,
+        nextQuestion: ques2,
         isRoot: rootIndex === index ? true : false,
       };
+
+      // console.error("oo:",obj)
       const flowListArray = [...flowData, obj];
       setFlowData(flowListArray);
-      // console.log(flowList);
-      console.error(flowData);
+      // console.error(flowListArray);
+
+      const obj2 = {
+        flowName: flowname,
+        currQuestionId: selectedOptions[index]._id,
+        answerValue:
+          selectedOptions[index].possibleAnswers[subIndex].answerValue,
+        nextQuestionId: newValue.value,
+        isRoot: rootIndex === index ? true : false,
+      }
+      const editFlowArray = [...editFlow, obj2];
+      setEditFlow(editFlowArray);
+      // console.error(editFlowArray)
       return;
     }
   };
+
+  const handleSaveEdit = async () => {
+    try {
+      await axios.put(`/questions-and-flows/edit-flow/${flowname}`, {
+      listOfFlow: editFlow,
+    }).then((resp) => {
+      if(resp.status === 200){
+        alert("Edited Successfully!")
+        onClose();
+      } else {
+        alert("Error while editing!");
+        onClose();
+      }
+    });
+    } catch (error) {
+      if (error.response && error.response.status === 500) {
+        alert("Something went wrong. Please try again later.");
+        onClose();
+      }
+    }
+  }
+
 
   const renderOptionsGrid = () => {
     // const optionsAvailable = ['Option 1', 'Option 2', 'Option 3', 'Option 4', 'Option 5']
@@ -267,25 +360,7 @@ const ViewEditModal = ({ isOpen, onClose, flowSelected }) => {
       </Grid>
     );
   };
-  const [onChangeHit, setOnChangeHit] = useState(false);
-  const setTheValueSelected = (index, subIdex, newValue) => {
-    // if (onChangeHit) {
-    //   return newValue;
-    // } else {
-    //   return (
-    //     flowData
-    //       .filter(
-    //         (item) =>
-    //           item.currQuestionId === selectedOptions[index]._id &&
-    //           item.answerValue.toLowerCase() ===
-    //             selectedOptions[index].possibleAnswers[
-    //               subIdex
-    //             ].answerValue.toLowerCase()
-    //       )
-    //       .map((item) => item.nextQuestion)[0]?.questionText || null
-    //   );
-    // }
-  }
+
   const renderStepContent = () => {
     switch (step) {
       case 1:
@@ -301,6 +376,7 @@ const ViewEditModal = ({ isOpen, onClose, flowSelected }) => {
               fullWidth
               margin="normal"
               required
+              disabled
             />
             {renderOptionsGrid()}
           </div>
@@ -574,7 +650,9 @@ const ViewEditModal = ({ isOpen, onClose, flowSelected }) => {
             )}
 
             {step < 2 && (
-              <Button
+              <>
+                <div className="leftBtn">
+                  <Button
                 // type="submit"
                 variant="contained"
                 sx={{
@@ -585,11 +663,14 @@ const ViewEditModal = ({ isOpen, onClose, flowSelected }) => {
                     color: "#F8B31C",
                   },
                   mx: 1,
+                  
                 }}
                 onClick={handleNext}
               >
                 Next
               </Button>
+              </div>
+              </>
             )}
 
             {step === 2 && (
@@ -606,9 +687,28 @@ const ViewEditModal = ({ isOpen, onClose, flowSelected }) => {
                   mx: 1,
                   my: 2,
                 }}
+                onClick={handleSaveEdit}
+              >
+                Save
+              </Button>
+            )}
+            {step === 2 && (
+              <Button
+                // type="submit"
+                variant="contained"
+                sx={{
+                  backgroundColor: "#F8B31C",
+                  color: "#1B5180",
+                  "&:hover": {
+                    backgroundColor: "#1B5180",
+                    color: "#F8B31C",
+                  },
+                  mx: 1,
+                  my: 2,
+                }}
                 // onClick={handleFinish}
               >
-                Finish
+                Discard
               </Button>
             )}
           </div>

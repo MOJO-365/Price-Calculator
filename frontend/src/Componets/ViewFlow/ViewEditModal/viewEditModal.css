@@ -13,3 +13,7 @@
   overflow: auto;
   overflow-x: hidden;
 }
+
+.btns{
+  display: flex;
+}
