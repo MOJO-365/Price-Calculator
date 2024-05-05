@@ -9,7 +9,8 @@ import DialogTitle from "@mui/material/DialogTitle";
 import Button from "@mui/material/Button";
 import { useEffect, useState } from "react";
 import ViewEditModal from "./ViewEditModal/ViewEditModal";
-
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const ViewFlow = () => {
   const [allFlows, setAllFlows] = useState([]);
@@ -52,17 +53,31 @@ const ViewFlow = () => {
     setViewEditModal(false);
   }
   const handleDelete = async () => {
-    const flowname = allFlows[deleteIndex].flowName;
-    await axios.delete(`/delete-flow/${flowname}`).then((resp) => {
-      console.log(resp.data.data);
-      if (resp.status === 200) {
-        setAllFlows(resp.data.data[0].flows);
+    const flowname = allFlows[deleteIndex]._id;
+    console.log(allFlows[deleteIndex]);
+    try {
+      await axios
+      .delete(`/questions-and-flows/delete-flow/${flowname}`)
+      .then((resp) => {
+        console.log(resp.data.data);
+        if (resp.status === 200) {
+          toast.success("Flow Deleted Successfully")
+          getAllFlows();
+          closeDeleteDialog();
+        } else {
+          toast.error("Delete Error");
+        }
+      });
+    } catch (error) {
+      if (error.response && error.response.status === 500) {
+        toast.error("Something went wrong. Please try again later.");
       }
-    });
+    }
   }
 
   return (
     <>
+      <ToastContainer />
       <div className="viewFlows">
         <Grid container spacing={3}>
           {Array.isArray(allFlows) &&

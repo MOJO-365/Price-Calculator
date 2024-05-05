@@ -16,6 +16,7 @@ const UserView = () => {
   const [flowData, setFlowData] = useState(data.flows);
   const [rootIdx, setRootIdx] = useState(data.flows.findIndex(obj => obj.isRoot))
   const [currentIdx, setCurrentIdx] = useState(rootIdx);
+  const [currentQuesId, setCurrentQuesId] = useState(flowData[rootIdx].currQuestionId)
   const [ans, setAns] = useState(flowData[rootIdx].currQuestion.possibleAnswers);
   const [ques, setQues] = useState(flowData[rootIdx].currQuestion.questionText);
   // const [nextQues, setNextQues] = useState(flowData[rootIdx].nextQuestion);
@@ -69,25 +70,28 @@ const UserView = () => {
         { ques: ques, answerValue: selectedAnswer.answerValue, quantity: quantity, cost: selectedAnswer.cost },
       ]);
       setTotalCost(totalCost + selectedAnswer.cost*quantity);
-      setSelectedAnswer(null);
+      
 
       if (currentIdx === -1) {
         setOpenMsg(true);
         return;
       }
-      const nextQues = flowData[currentIdx].nextQuestion;
+
+      const current = flowData.findIndex(obj => obj.currQuestionId === currentQuesId && obj.answerValue === selectedAnswer.answerValue);
+      const nextQues = flowData[current].nextQuestion;
       // if (nextQues === null) {
       //   setOpenMsg(true);
       //   return;
       // }
       if (nextQues) {
-        console.log("yeha", nextQues)
+        // console.log("yeha", nextQues)
         setQues(nextQues.questionText)
         setAns(nextQues.possibleAnswers);
         
         const index = flowData.findIndex((obj) => obj.currQuestionId === nextQues._id);
         // if (index != -1) {
-          setCurrentIdx(index)
+        setCurrentIdx(index)
+        setCurrentQuesId(nextQues._id)
         // }
         // /console.log(index)
         // if (index != -1) {
@@ -95,18 +99,20 @@ const UserView = () => {
       // }
       // else {
       //     setOpenMsg(true);
-      //   }
+        //   }
+        setSelectedAnswer(null);
       }
+      
       else {
         setOpenMsg(true);
       }
-      
+      setSelectedAnswer(null);
     }
   };
 
   return (
     <>
-      <div className="centerFlowName">FLOW1</div>
+      <div className="centerFlowName">{flowData._id}</div>
       {openMsg ? (
         <>
           <div className="finalMsg">
