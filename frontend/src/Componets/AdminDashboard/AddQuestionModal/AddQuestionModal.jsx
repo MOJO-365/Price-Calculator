@@ -1,12 +1,26 @@
 import "./addQuestionModal.css";
 // import TextField from "@mui/material/TextField";
 import { TextField, RadioGroup, Radio, FormControlLabel, Button, FormControl, FormLabel, Typography, Checkbox } from '@mui/material';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "../../../axiosConfig";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom";
 const AddQuestionModal = ({ isOpen, onClose }) => {
+  const [token, setToken] = useState();
+  const navigate = useNavigate();
+  useEffect(() => {
+    const fetchToken = () => {
+      const tokenFromCookie = Cookies.get("access_token");
+      if (!tokenFromCookie) {
+        navigate("/");
+      } else {
+        setToken(tokenFromCookie);
+      }
+    };
+    fetchToken();
+  }, []);
   const [questionText, setQuestionText] = useState("");
   const [questionType, setQuestionType] = useState('');
   const [numAnswers, setNumAnswers] = useState(1);
@@ -47,7 +61,7 @@ const AddQuestionModal = ({ isOpen, onClose }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    console.log(token)
     if (questionText === "" || questionType === "") {
       toast.error("Please add the details first.")
       return;
@@ -79,6 +93,11 @@ const AddQuestionModal = ({ isOpen, onClose }) => {
           questionType: questionType,
           noOfPossibleAnswers: 2,
           possibleAnswers: yesNoAnswer,
+        }, {
+          headers: {
+            "Content-Type": "application/json",
+            "authorization": `Bearer ${token}`,
+          },
         })
         .then((resp) => {
             if (resp.status === 200) {
@@ -141,7 +160,12 @@ const AddQuestionModal = ({ isOpen, onClose }) => {
             questionType: questionType,
             noOfPossibleAnswers: numAnswers,
             possibleAnswers: answers,
-          })
+          }, {
+          headers: {
+            "Content-Type": "application/json",
+            "authorization": `Bearer ${token}`,
+          },
+        })
           .then((resp) => {
             if (resp.status === 200) {
               toast.success("Data added successfully!", {

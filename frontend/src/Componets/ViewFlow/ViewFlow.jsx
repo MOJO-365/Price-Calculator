@@ -11,8 +11,11 @@ import { useEffect, useState } from "react";
 import ViewEditModal from "./ViewEditModal/ViewEditModal";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom";
 const ViewFlow = () => {
+  const [token, setToken] = useState();
+  const navigate = useNavigate();
   const [allFlows, setAllFlows] = useState([]);
   const [deleteDialog, setDeleteDialog] = useState(false);
   const [deleteIndex, setDeleteIndex] = useState(0);
@@ -34,6 +37,15 @@ const ViewFlow = () => {
   }
 
   useEffect(() => {
+    const fetchToken = () => {
+      const tokenFromCookie = Cookies.get("access_token");
+      if (!tokenFromCookie) {
+        navigate("/");
+      } else {
+        setToken(tokenFromCookie);
+      }
+    };
+    fetchToken();
     getAllFlows();
   }, []);
 
@@ -53,21 +65,26 @@ const ViewFlow = () => {
     setViewEditModal(false);
   }
   const handleDelete = async () => {
-    const flowname = allFlows[deleteIndex]._id;
-    console.log(allFlows[deleteIndex]);
+    // const flowname = allFlows[deleteIndex]._id;
+    // console.log(allFlows[deleteIndex]);
     try {
       await axios
-      .delete(`/questions-and-flows/delete-flow/${flowname}`)
-      .then((resp) => {
-        console.log(resp.data.data);
-        if (resp.status === 200) {
-          toast.success("Flow Deleted Successfully")
-          getAllFlows();
-          closeDeleteDialog();
-        } else {
-          toast.error("Delete Error");
-        }
-      });
+        .delete(`/questions-and-flows/delete-flow/${deleteIndex}`, {
+          headers: {
+            "Content-Type": "application/json",
+            "authorization": `Bearer ${token}`,
+          },
+        })
+        .then((resp) => {
+          // console.log(resp.data.data);
+          if (resp.status === 200) {
+            toast.success("Flow Deleted Successfully");
+            getAllFlows();
+            closeDeleteDialog();
+          } else {
+            toast.error("Delete Error");
+          }
+        });
     } catch (error) {
       if (error.response && error.response.status === 500) {
         toast.error("Something went wrong. Please try again later.");
@@ -104,7 +121,8 @@ const ViewFlow = () => {
                     
                     <button
                       onClick={() => {
-                        setDeleteIndex(index);
+                        console.log(flow._id)
+                        setDeleteIndex(flow._id);
                         openDeleteDialog();
                       }}
                     >

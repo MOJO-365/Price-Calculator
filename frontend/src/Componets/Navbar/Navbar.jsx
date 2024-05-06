@@ -19,7 +19,7 @@ import { useNavigate } from "react-router-dom";
 
 
 const drawerWidth = 240;
-const navItems = ["Home", "View Flows", "View Questions", "Flow Layout"];
+const navItems = ["View Flows", "View Questions", "Flow Layout"];
 const theme = createTheme({
   palette: {
     primary: {
@@ -82,7 +82,7 @@ const Navbar = (props) => {
                 color: "#F8B31C",
                 cursor: "pointer",
               }}
-              onClick={() => navigate("/")}
+              onClick={() => navigate("/dashboard")}
             >
               PRICING CALCULATOR - ADMIN DASHBOARD
             </Typography>
@@ -96,8 +96,6 @@ const Navbar = (props) => {
                       navigate("/viewquestions");
                     } else if (item === "View Flows") {
                       navigate("/viewflows");
-                    } else if (item === "Home") {
-                      navigate("/dashboard");
                     } else if (item === "Flow Layout") {
                       navigate("/selectflow")
                     }

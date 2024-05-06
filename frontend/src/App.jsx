@@ -18,7 +18,6 @@ function App() {
             path="/dashboard"
             element={<AdminDashboard></AdminDashboard>}
           ></Route>
-          <Route path="/new" element={<Navbar />}></Route>
           {/* <Route path="/tree" element={<TreeView />}></Route> */}
           <Route
             path="/viewquestions"

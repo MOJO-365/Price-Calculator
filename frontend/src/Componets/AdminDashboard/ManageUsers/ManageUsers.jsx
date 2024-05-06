@@ -47,9 +47,9 @@ const ManageUsers = ({ isOpen, onClose }) => {
   };
 
   const handleEditChange = (index, field, value) => {
-    console.log(index)
-    console.log(field)
-    console.log(value);
+    // console.log(index)
+    // console.log(field)
+    // console.log(value);
     const edited = [...editData];
     edited[index] = { ...edited[index], [field]: value };
     setEditData(edited);

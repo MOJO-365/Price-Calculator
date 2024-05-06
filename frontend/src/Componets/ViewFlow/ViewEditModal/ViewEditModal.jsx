@@ -4,8 +4,13 @@ import axios from "../../../axiosConfig";
 import { Modal, Button, Checkbox, FormControlLabel, TextField, Typography, Grid } from '@mui/material';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import Autocomplete from "@mui/material/Autocomplete";
+import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom";
+
 
 const ViewEditModal = ({ isOpen, onClose, flowSelected }) => {
+  const navigate = useNavigate();
+  const [token, setToken] = useState();
   // console.log("flow:",flowSelected)
   const [step, setStep] = useState(1);
   const [questions, setQuestions] = useState([]);
@@ -133,6 +138,15 @@ const ViewEditModal = ({ isOpen, onClose, flowSelected }) => {
     });
   }
   useEffect(() => {
+    const fetchToken = () => {
+      const tokenFromCookie = Cookies.get("access_token");
+      if (!tokenFromCookie) {
+        navigate("/");
+      } else {
+        setToken(tokenFromCookie);
+      }
+    };
+    fetchToken();
     getAllQuestions();
     getFlowByFlowName();
   }, []);
@@ -320,6 +334,11 @@ const ViewEditModal = ({ isOpen, onClose, flowSelected }) => {
     try {
       await axios.put(`/questions-and-flows/edit-flow/${flowname}`, {
       listOfFlow: editFlow,
+      }, {
+      headers: {
+            "Content-Type": "application/json",
+            "authorization": `Bearer ${token}`,
+          },
     }).then((resp) => {
       if(resp.status === 200){
         alert("Edited Successfully!")
@@ -470,7 +489,7 @@ const ViewEditModal = ({ isOpen, onClose, flowSelected }) => {
                       >
                         Select Next Question
                       </TableCell>
-                      <TableCell
+                      {/* <TableCell
                         sx={{
                           fontSize: "15px",
                           textTransform: "uppercase",
@@ -479,7 +498,7 @@ const ViewEditModal = ({ isOpen, onClose, flowSelected }) => {
                         }}
                       >
                         Select End Question
-                      </TableCell>
+                      </TableCell> */}
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -575,7 +594,7 @@ const ViewEditModal = ({ isOpen, onClose, flowSelected }) => {
                                 />
                               </FormControl>
                             </TableCell>
-                            <TableCell>
+                            {/* <TableCell>
                               <button
                                 className={
                                   leafIndex === -1
@@ -591,11 +610,7 @@ const ViewEditModal = ({ isOpen, onClose, flowSelected }) => {
                                   )
                                 }
                               >
-                                {/* {leafIndex.questionid == question._id &&
-                                leafIndex.answerValue ==
-                                  question.possibleAnswers[subIndex].answerValue
-                                  ? "SELECTED"
-                                  : "SELECT END"} */}
+                                
                                 {leafIndex.questionid === question._id &&
                                 leafIndex.answerValue.toLowerCase() ==
                                   question.possibleAnswers[
@@ -604,7 +619,7 @@ const ViewEditModal = ({ isOpen, onClose, flowSelected }) => {
                                   ? "SELECTED"
                                   : "SELECT END"}
                               </button>
-                            </TableCell>
+                            </TableCell> */}
                           </TableRow>
                         </>
                       ))

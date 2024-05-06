@@ -50,6 +50,12 @@ const UserView = () => {
   }
 
   const closeQtyModal = (qty) => {
+    if (!qty) {
+      console.log("yy")
+      setQuantity(1);
+      setQtyModal(false);
+      return;
+    }
     setQuantity(qty)
     setQtyModal(false);
   };
@@ -64,6 +70,20 @@ const UserView = () => {
 
   const handleSaveClick = () => {
     // console.log(selectedAnswer);
+
+    const idx = flowData.findIndex(
+      (obj) =>
+        obj.currQuestionId === currentQuesId &&
+        obj.answerValue === selectedAnswer.answerValue
+    );
+    const isNextQuestionAvailable = flowData[idx];
+    if (!isNextQuestionAvailable) {
+      setCurrentIdx(-1);
+      setOpenMsg(true);
+      setSelectedAnswer(null);
+      return;
+    }
+    closeQtyModal();
     if (selectedAnswer) {
       setSelectedAnswers([
         ...selectedAnswers,
@@ -104,6 +124,7 @@ const UserView = () => {
       }
       
       else {
+        setCurrentIdx(-1);
         setOpenMsg(true);
       }
       setSelectedAnswer(null);

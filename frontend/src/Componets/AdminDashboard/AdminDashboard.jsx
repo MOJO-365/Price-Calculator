@@ -8,8 +8,22 @@ import AddFlowModal from "./AddFlowModal/AddFlowModal";
 import ManageUsers from "./ManageUsers/ManageUsers";
 import axios from "../../axiosConfig";
 // import zIndex from "@mui/material/styles/zIndex";
-
+import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom";
 const AdminDashboard = () => {
+  const [token, setToken] = useState();
+  const navigate = useNavigate();
+  useEffect(() => {
+    const fetchToken = () => {
+      const tokenFromCookie = Cookies.get("access_token");
+      if (!tokenFromCookie) {
+        navigate("/")
+      } else {
+        setToken(token)
+      }
+    }
+    fetchToken();
+  }, []);
   const [questionModal, setQuestionModal] = useState(false);
   const [flowModal, setFlowModal] = useState(false);
   const [usersModal, setUsersModal] = useState(false);

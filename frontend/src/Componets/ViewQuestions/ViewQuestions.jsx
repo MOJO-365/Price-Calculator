@@ -11,8 +11,12 @@ import DialogTitle from "@mui/material/DialogTitle";
 import Button from "@mui/material/Button";
 import ViewAnswerModal from "./ViewAnswerModal";
 import EditModal from "./EditModal/EditModal";
+import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom";
 
 const ViewQuestions = () => {
+  const [token, setToken] = useState();
+  const navigate = useNavigate();
   const [questions, setQuestions] = useState([]);
   const [deleteDialog, setDeleteDialog] = useState(false);
   const [answerModal, setAnswerModal] = useState(false);
@@ -22,27 +26,43 @@ const ViewQuestions = () => {
   const getAllQuestions = async () => {
     await axios.get("/questions-and-flows/get-all-questions").then((resp) => {
       console.log(resp.data.data[0]);
-      setQuestions(resp.data.data);
-      
+      setQuestions(resp.data.data)
     });
   }
   useEffect(() => {
+    const fetchToken = () => {
+      const tokenFromCookie = Cookies.get("access_token");
+      if (!tokenFromCookie) {
+        navigate("/");
+      } else {
+        setToken(tokenFromCookie);
+      }
+    };
+    fetchToken();
     getAllQuestions();
   }, []);
 
   const handleDelete = async () => {
     const idx = questions[deleteIndex]._id;
+    
     // console.log
-    await axios.delete(`/questions-and-flows/delete-question/${idx}`).then((resp) => {
-      if (resp.data.message === "success") {
-        closeDeleteDialog();
-        getAllQuestions();
-      } else {
-        alert("Delete Error!")
-        closeDeleteDialog();
-        getAllQuestions();
-      }
-    });
+    await axios
+      .delete(`/questions-and-flows/delete-question/${idx}`, {
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Bearer ${token}`,
+        },
+      })
+      .then((resp) => {
+        if (resp.data.message === "success") {
+          closeDeleteDialog();
+          getAllQuestions();
+        } else {
+          alert("Delete Error!");
+          closeDeleteDialog();
+          getAllQuestions();
+        }
+      });
   }
   const closeDeleteDialog = () => {
     setDeleteDialog(false);
@@ -60,6 +80,7 @@ const ViewQuestions = () => {
     setAnswerModal(true);
   }
   const closeEditModal = () => {
+    getAllQuestions();
     setEditModal(false);
   };
 

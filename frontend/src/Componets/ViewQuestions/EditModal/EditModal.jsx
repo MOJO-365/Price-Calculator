@@ -1,11 +1,15 @@
 import "./editModal.css";
 import { TextField, RadioGroup, Radio, FormControlLabel, Button, FormControl, FormLabel, Typography, Checkbox } from '@mui/material';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "../../../axiosConfig";
-const EditModal = ({ isOpen, onClose, questionData }) => {
+import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom";
 
+const EditModal = ({ isOpen, onClose, questionData }) => {
+  const navigate = useNavigate();
+  const [token, setToken] = useState();
   const [qData, setQData] = useState(questionData);
   const [questionText, setQuestionText] = useState(questionData.questionText);
   const [questionType, setQuestionType] = useState(questionData.questionType === 'integer' ?  'number' : questionData.questionType);
@@ -29,6 +33,21 @@ const EditModal = ({ isOpen, onClose, questionData }) => {
     },
   ]);
 
+  useEffect(() => {
+    if (questionData.questionType === 'boolean') {
+      setYesNoAnswer(questionData.possibleAnswers);
+    }
+
+    const fetchToken = () => {
+      const tokenFromCookie = Cookies.get("access_token");
+      if (!tokenFromCookie) {
+        navigate("/");
+      } else {
+        setToken(tokenFromCookie);
+      }
+    };
+    fetchToken();
+  }, [])
   const handleYesNoQuantifiableCheck = (isChecked, label) => {
     const answerData = [...yesNoAnswer];
     const index = label === "yes" ? 0 : 1;
@@ -82,6 +101,11 @@ const EditModal = ({ isOpen, onClose, questionData }) => {
             questionType: questionType,
             noOfPossibleAnswers: 2,
             possibleAnswers: yesNoAnswer,
+          }, {
+            headers: {
+            "Content-Type": "application/json",
+            "authorization": `Bearer ${token}`,
+          },
           })
           .then((resp) => {
             console.log(resp.data.data);
@@ -145,6 +169,11 @@ const EditModal = ({ isOpen, onClose, questionData }) => {
             questionType: questionType,
             noOfPossibleAnswers: numAnswers,
             possibleAnswers: answers,
+          }, {
+            headers: {
+            "Content-Type": "application/json",
+            "authorization": `Bearer ${token}`,
+          },
           })
           .then((resp) => {
             console.log(resp.data.data);
@@ -291,7 +320,7 @@ const EditModal = ({ isOpen, onClose, questionData }) => {
                               label="Quantifiable"
                             />
                           </div>
-                          {yesNoAnswer[0].isQuantifyable && (
+                          {/* {yesNoAnswer[0].isQuantifyable && ( */}
                             <TextField
                               type="number"
                               label="Cost for Yes"
@@ -301,7 +330,7 @@ const EditModal = ({ isOpen, onClose, questionData }) => {
                               }
                               margin="normal"
                             />
-                          )}
+                          {/* )} */}
                         </div>
                         <div className="answerAndQuantity">
                           <div className="quantifiableSection">
@@ -323,7 +352,7 @@ const EditModal = ({ isOpen, onClose, questionData }) => {
                               label="Quantifiable"
                             />
                           </div>
-                          {yesNoAnswer[1].isQuantifyable && (
+                          {/* {yesNoAnswer[1].isQuantifyable && ( */}
                             <TextField
                               type="number"
                               label="Cost for No"
@@ -333,7 +362,7 @@ const EditModal = ({ isOpen, onClose, questionData }) => {
                               }
                               margin="normal"
                             />
-                          )}
+                          {/* )} */}
                         </div>
                       </div>
                     </>
@@ -369,7 +398,7 @@ const EditModal = ({ isOpen, onClose, questionData }) => {
                             }
                             margin="normal"
                           />
-                          {answer.isQuantifyable && (
+                          {/* {answer.isQuantifyable && ( */}
                             <TextField
                               type="number"
                               label={`Cost for Answer ${index + 1}`}
@@ -379,7 +408,7 @@ const EditModal = ({ isOpen, onClose, questionData }) => {
                               }
                               margin="normal"
                             />
-                          )}
+                          {/* )} */}
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -424,7 +453,7 @@ const EditModal = ({ isOpen, onClose, questionData }) => {
                             }
                             margin="normal"
                           />
-                          {answer.isQuantifyable && (
+                          {/* {answer.isQuantifyable && ( */}
                             <TextField
                               type="number"
                               label={`Cost for Answer ${index + 1}`}
@@ -434,7 +463,7 @@ const EditModal = ({ isOpen, onClose, questionData }) => {
                               }
                               margin="normal"
                             />
-                          )}
+                          {/* )} */}
                           <FormControlLabel
                             control={
                               <Checkbox

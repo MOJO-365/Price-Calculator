@@ -4,9 +4,12 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, FormC
 import { useEffect, useState } from "react";
 import Autocomplete from "@mui/material/Autocomplete";
 import axios from "../../../axiosConfig";
+import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom";
 
 const AddFlowModal = ({ isOpen, onClose }) => {
-
+  const [token, setToken] = useState();
+  const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [flowname, setFlowname] = useState('');
   const [selectedOptions, setSelectedOptions] = useState([]);
@@ -54,6 +57,14 @@ const AddFlowModal = ({ isOpen, onClose }) => {
   const [flowList, setFlowList] = useState([]);
   
   useEffect(() => {
+    const fetchToken = () => {
+      const tokenFromCookie = Cookies.get("access_token");
+      if (!tokenFromCookie) {
+        navigate("/");
+      } else {
+        setToken(tokenFromCookie);
+      }
+    };
     const getAllQuestions = async () => {
         await axios
           .get("/questions-and-flows/get-all-questions")
@@ -61,22 +72,22 @@ const AddFlowModal = ({ isOpen, onClose }) => {
             console.log(resp.data.data);
             setQuestions(resp.data.data)
           });
-  }
-    
+    }
+    fetchToken();
     getAllQuestions();
   }, [])
   const handleNext = () => {
-    // if (flowname === "" && selectedOptions.length === 0) {
-    //   alert("You'll need to enter the details");
-    //   return;
-    // }
-    // else if (flowname === "") {
-    //   alert("Enter the flow name first!");
-    //   return;
-    // } else if (selectedOptions.length === 0) {
-    //   alert("Select the questions First!");
-    //   return;
-    // }
+    if (flowname === "" && selectedOptions.length === 0) {
+      alert("You'll need to enter the details");
+      return;
+    }
+    else if (flowname === "") {
+      alert("Enter the flow name first!");
+      return;
+    } else if (selectedOptions.length === 0) {
+      alert("Select the questions First!");
+      return;
+    }
     setStep(step + 1);
   }
 
@@ -94,16 +105,37 @@ const AddFlowModal = ({ isOpen, onClose }) => {
     }
     console.log(flowList)
     // const arrayOfFlows = Object.values(flowList);
-    await axios
-      .post("/questions-and-flows/create-flow", {
-        listOfFlow: flowList,
-      })
-      .then((resp) => {
-        console.log(resp.data.data);
-        
-      });
+    try {
+      await axios
+        .post(
+          "/questions-and-flows/create-flow",
+          {
+            listOfFlow: flowList,
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+              authorization: `Bearer ${token}`,
+            },
+          }
+        )
+        .then((resp) => {
+          console.log(resp.data.data);
+          if (resp.status === 200) {
+            alert("Flow created!");
+            onClose();
+          } else {
+            alert("Error. Flow couldn't be created!");
+            onClose();
+          }
+        });
+    } catch (error) {
+      if (error.response && error.response.status === 500) {
+        alert("Something went wrong. Please try again later.");
+      }
+    }
 
-    onClose();
+    
   };
 
   const handleCheckboxChange = (option) => {
@@ -388,7 +420,7 @@ const AddFlowModal = ({ isOpen, onClose }) => {
                       >
                         Select Next Question
                       </TableCell>
-                      <TableCell
+                      {/* <TableCell
                         sx={{
                           fontSize: "15px",
                           textTransform: "uppercase",
@@ -397,7 +429,7 @@ const AddFlowModal = ({ isOpen, onClose }) => {
                         }}
                       >
                         Select End Question
-                      </TableCell>
+                      </TableCell> */}
                     </TableRow>
                   </TableHead>
                   {/* <TableBody>
@@ -532,7 +564,7 @@ const AddFlowModal = ({ isOpen, onClose }) => {
                                     ))}
                                 </Select> */}
                               </TableCell>
-                              <TableCell>
+                              {/* <TableCell>
                                 <button
                                   className={
                                     leafIndex === -1
@@ -545,7 +577,7 @@ const AddFlowModal = ({ isOpen, onClose }) => {
                                     ? "SELECTED"
                                     : "SELECT END"}
                                 </button>
-                              </TableCell>
+                              </TableCell> */}
                             </TableRow>
                           </>
                         ))
