@@ -117,15 +117,19 @@ const deleteQuestion = async (req, res) => {
 
 const createFlow = async (req, res) => {
   
+  console.log("create flow: req body: "+req.body.listOfFlow)
   try {
     const listOfFlow = req.body.listOfFlow;
     for (const flow of listOfFlow) {
       
       const flowNode = new FlowSchema(flow);
-      
+      // console.log(flow)
+      // console.log(" curr Question: "+ await Question.findById(flow.currQuestionId))
       await flowNode.save();
     }
 
+    // console.log("response of create flow: " + listOfFlow)
+    
     res.status(200).json({
       message: "success",
       data: listOfFlow
@@ -333,7 +337,7 @@ const isFlowValid = async (req, res)=>{
       res.status(500);
       res.json({
         message: "failure",
-        data: "Improper reques body",
+        data: "Improper request body",
       });
     }
 
