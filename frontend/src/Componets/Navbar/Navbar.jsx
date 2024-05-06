@@ -19,7 +19,7 @@ import { useNavigate } from "react-router-dom";
 
 
 const drawerWidth = 240;
-const navItems = ["View Flows", "View Questions", "Flow Layout"];
+const navItems = ["View Flows", "View Questions", "Flow Layout", "Logout"];
 const theme = createTheme({
   palette: {
     primary: {
@@ -98,6 +98,13 @@ const Navbar = (props) => {
                       navigate("/viewflows");
                     } else if (item === "Flow Layout") {
                       navigate("/selectflow")
+                    } else if (item === "Logout") {
+                      document.cookie =
+                        "access_token" +
+                        "=; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+                      
+                      navigate("/")
+  
                     }
                   }}
                 >

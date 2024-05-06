@@ -6,9 +6,14 @@ import { useEffect, useState } from "react";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from "../../axiosConfig";
+import Cookies from "js-cookie";
 
 const Signin = () => {
   const navigate = useNavigate();
+  const tokenFromCookie = Cookies.get("access_token");
+  if (tokenFromCookie) {
+    navigate("/dashboard")
+  }
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
@@ -32,7 +37,7 @@ const Signin = () => {
         password: password,
       })
       .then((resp) => {
-        console.log(resp)
+        // console.log(resp)
         if (resp.status === 200) {
           const token = resp.data.access_token;
           const cookieName = "access_token";
