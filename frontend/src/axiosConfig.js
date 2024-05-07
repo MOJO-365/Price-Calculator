@@ -2,7 +2,7 @@ import axios from "axios";
 
 const axiosInstance = axios.create({
   // baseURL: 'http://192.168.77.253:8080/dinedynamo', // Replace with your API base URL
-  baseURL: "http://https://price-calculator-backend-eqqwdl0v1-mojo-365s-projects.vercel.app/", // Replace with your API base URL
+  baseURL: "https://price-calculator-backend-eqqwdl0v1-mojo-365s-projects.vercel.app/", // Replace with your API base URL
   timeout: 8000, // Set a timeout for requests in milliseconds (optional)
   headers: {
     "Content-Type": "application/json",
