@@ -18,6 +18,7 @@ app.use(cors());
 //Connecting to DB
 const connectionOptions = {
   // Adjust this value as needed
+    connectTimeoutMS: 60000,
   serverSelectionTimeoutMS: 60000, // 60 seconds
 };
 
