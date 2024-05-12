@@ -1,5 +1,5 @@
 const express = require("express");
-const mongo = require("mongoose");
+const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const body_parser = require("body-parser");
@@ -16,21 +16,25 @@ app.use(cookieParser());
 app.use(cors());
 
 //Connecting to DB
-mongo.connect(process.env.DATABASE_CONNECTION_URL);
-mongo.connection.on("error", (err) => {
-  console.error("Database connection error:", err);
-});
+const connectionOptions = {
+  // Adjust this value as needed
+  serverSelectionTimeoutMS: 60000, // 60 seconds
+};
 
-// Handle successful connection
-mongo.connection.once("open", () => {
-  console.log("Connected to MongoDB");
-});
+const mongoUri = 'mongodb+srv://root:root@cluster0.mw0de2w.mongodb.net/pricing-calculator?retryWrites=true&w=majority&appName=Cluster0';
 
+mongoose.connect(mongoUri, connectionOptions)
+  .then(() => {
+    console.log('Connected to MongoDB');
+  })
+  .catch((error) => {
+    console.error('Error connecting to MongoDB:', error);
+  });
 
 app.use("/auth", authRoute);
 app.use("/users", usersRoute);
 app.use("/questions-and-flows", questionAndFlowRoutes)
 
-app.listen(process.env.PORT, () => {
+app.listen(process.env.PORT||8000, () => {
   console.log("Server running.....");
 });
